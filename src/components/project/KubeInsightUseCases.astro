@@ -1,0 +1,380 @@
+---
+import Icon from "../Icons.astro";
+
+const cases = [
+  {
+    id: "events",
+    icon: "bell-ring",
+    label: "Expired events",
+    title: "PolicyViolation events after the workload looks healthy",
+    symptom: "A deployment was rejected or repeatedly reconciled with policy warnings. By the time someone investigates, the workload may look healthy and Events may have rotated out.",
+    kubectl: ["Events are short-lived and often rotated.", "Warning Events must be joined back to Deployments, ReplicaSets, and Pods.", "The policy controller may no longer list every affected object."],
+    evidence: ["k8s_event.reason, type, and message facts", "event edges to involved resources", "Deployment, ReplicaSet, and Pod retained versions"],
+    path: ["Check coverage", "Find warning Events", "Follow involved-object edges", "Open retained history"],
+    query: "where fact_key in ('k8s_event.reason', 'k8s_event.type') and (fact_value = 'Warning' or severity >= 60)",
+    result: "PolicyViolation warning Events tied back to workload objects, even when the current cluster no longer shows the full incident window.",
+  },
+  {
+    id: "service",
+    icon: "workflow",
+    label: "Service topology",
+    title: "Service / EndpointSlice proof after resources changed",
+    symptom: "A Service briefly routed to no endpoints or unready Pods. Later the Service is healthy, old Pods may be replaced, and the useful topology has moved on.",
+    kubectl: ["Current EndpointSlices only show current endpoints.", "Deleted rollout objects and old Pods cannot be reconstructed from live state alone.", "Pod readiness transitions and Events may no longer line up in one live query."],
+    evidence: ["endpointslice_for_service edges", "endpointslice_targets_pod edges", "Endpoint readiness, Pod readiness, and restart facts", "Service investigation bundle with proof versions"],
+    path: ["Find Service facts", "Expand EndpointSlice edges", "Inspect Pod readiness", "Cross-check current kubectl"],
+    query: "endpointslice_for_service -> endpointslice_targets_pod -> Pod readiness facts -> retained versions",
+    result: "The investigation can show which historical EndpointSlices pointed at which Pods, then use kubectl only as the final live-state comparison.",
+  },
+] as const;
+---
+
+<section class="ki-use-cases" aria-label="kube-insight practical use cases">
+  <div class="section-intro">
+    <p class="section-label">Use cases</p>
+    <h2>Actual investigation shapes from the project docs.</h2>
+    <p>
+      The website should show more than a capability list. These cases demonstrate how retained facts, edges, observations, and versions become practical incident evidence.
+    </p>
+  </div>
+
+  <div class="case-switcher">
+    {cases.map((item, index) => <input id={`case-${item.id}`} type="radio" name="ki-case" checked={index === 0} />)}
+
+    <div class="case-tabs" role="tablist" aria-label="Use case selector">
+      {
+        cases.map((item) => (
+          <label for={`case-${item.id}`} role="tab">
+            <Icon name={item.icon} class="icon-sm" />
+            <span>{item.label}</span>
+          </label>
+        ))
+      }
+    </div>
+
+    <div class="case-stage">
+      {
+        cases.map((item) => (
+          <article class:list={["case-panel", `case-panel-${item.id}`]}>
+            <div class="case-hero">
+              <div>
+                <p>{item.label}</p>
+                <h3>{item.title}</h3>
+              </div>
+              <div class="case-badge"><Icon name={item.icon} class="icon-sm" /></div>
+            </div>
+
+            <div class="case-body">
+              <section class="case-summary">
+                <h4>Symptom</h4>
+                <p>{item.symptom}</p>
+              </section>
+
+              <section class="case-list kubectl-list">
+                <h4>Why live kubectl is weak later</h4>
+                <ul>{item.kubectl.map((line) => <li>{line}</li>)}</ul>
+              </section>
+
+              <section class="case-list evidence-list">
+                <h4>Evidence kube-insight uses</h4>
+                <ul>{item.evidence.map((line) => <li>{line}</li>)}</ul>
+              </section>
+
+              <section class="case-pathline" aria-label={`${item.label} investigation path`}>
+                {item.path.map((step, index) => <div><span>{String(index + 1).padStart(2, "0")}</span><strong>{step}</strong></div>)}
+              </section>
+
+              <section class="case-query">
+                <h4>Query shape</h4>
+                <code>{item.query}</code>
+              </section>
+
+              <section class="case-result">
+                <h4>What you get</h4>
+                <p>{item.result}</p>
+              </section>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .ki-use-cases {
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  .section-intro {
+    max-width: 54rem;
+  }
+
+  .section-label,
+  .case-hero p,
+  .case-tabs span,
+  .case-panel h4,
+  .case-pathline span {
+    margin: 0;
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  .section-intro h2 {
+    margin: 0.75rem 0 0;
+    font-size: 1.875rem;
+    line-height: 1.2;
+    font-weight: 650;
+  }
+
+  .section-intro p:last-child {
+    margin: 1rem 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+
+  .case-switcher {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .case-switcher > input {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .case-tabs {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .case-tabs label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-page);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 0.85rem 1rem;
+    transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+  }
+
+  .case-tabs label:hover {
+    transform: translateY(-1px);
+    border-color: var(--color-border-strong);
+  }
+
+  .case-tabs .icon-sm {
+    color: var(--color-accent);
+  }
+
+  #case-events:checked ~ .case-tabs label[for="case-events"],
+  #case-service:checked ~ .case-tabs label[for="case-service"] {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+
+  .case-stage {
+    position: relative;
+    display: grid;
+    min-width: 0;
+    min-height: 44rem;
+  }
+
+  .case-panel {
+    grid-area: 1 / 1;
+    min-width: 0;
+    max-width: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(0.6rem) scale(0.985);
+    transition: opacity 180ms ease, transform 180ms ease;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface);
+    overflow: hidden;
+  }
+
+  #case-events:checked ~ .case-stage .case-panel-events,
+  #case-service:checked ~ .case-stage .case-panel-service {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+    position: relative;
+    z-index: 2;
+  }
+
+  .case-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-page);
+    padding: 1.25rem;
+  }
+
+  .case-hero h3 {
+    max-width: 42rem;
+    margin: 0.65rem 0 0;
+    font-size: 1.65rem;
+    line-height: 1.16;
+  }
+
+  .case-badge {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    flex: 0 0 auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  .case-body {
+    display: grid;
+    min-width: 0;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .case-body > * {
+    min-width: 0;
+  }
+
+  .case-summary,
+  .case-list,
+  .case-query,
+  .case-result {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-page);
+    padding: 1rem;
+  }
+
+  .case-summary p,
+  .case-result p {
+    margin: 0.65rem 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.65;
+  }
+
+  .case-list ul {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0.7rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .case-list li {
+    position: relative;
+    padding-left: 1rem;
+    color: var(--color-text-muted);
+    line-height: 1.45;
+  }
+
+  .case-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 999px;
+    background: var(--color-signal);
+  }
+
+  .kubectl-list li::before {
+    background: var(--color-warn);
+  }
+
+  .case-pathline {
+    display: grid;
+    gap: 0.75rem;
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-page);
+    padding: 1rem;
+  }
+
+  .case-pathline div {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .case-pathline strong {
+    font-size: 0.95rem;
+  }
+
+  .case-query code {
+    display: block;
+    margin-top: 0.7rem;
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    padding: 0.8rem;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 760px) {
+    .case-tabs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .case-body {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .case-summary,
+    .case-pathline,
+    .case-query,
+    .case-result {
+      grid-column: 1 / -1;
+    }
+
+    .case-pathline {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .case-pathline div {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .case-stage {
+      min-height: 63rem;
+    }
+
+    .case-hero {
+      flex-direction: column;
+    }
+
+    .case-hero h3 {
+      font-size: 1.35rem;
+    }
+  }
+</style>

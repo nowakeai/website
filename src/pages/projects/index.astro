@@ -1,0 +1,301 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Icon from "../../components/Icons.astro";
+
+const activeProjects = [
+  {
+    name: "kube-insight",
+    status: "Active / flagship",
+    tag: "evidence",
+    title: "Retained Kubernetes evidence for humans and agents.",
+    description:
+      "Captures sanitized list/watch history, extracts facts, changes, and topology, and exposes read-only SQL, API, and MCP surfaces for investigation.",
+    href: "/projects/kube-insight",
+    repo: "https://github.com/nowakeai/kube-insight",
+    icon: "database-zap",
+  },
+  {
+    name: "svc-lb-mux",
+    status: "Active",
+    tag: "controller",
+    title: "Service LoadBalancer Multiplexer.",
+    description:
+      "A Kubernetes controller that lets many application-facing LoadBalancer Services share one provider-managed Layer 4 load balancer.",
+    href: "/projects/svc-lb-mux",
+    repo: "https://github.com/nowakeai/svc-lb-mux",
+    icon: "workflow",
+  },
+] as const;
+
+const directions = [
+  {
+    title: "Alert intelligence",
+    description:
+      "Assist alert triage and notification routing by reducing notification noise and surfacing meaningful cases with history, feedback, and operational context.",
+    icon: "bell-ring",
+  },
+  {
+    title: "Access and audit",
+    description: "Make temporary infrastructure access easier to grant, review, and explain.",
+    icon: "key-round",
+  },
+  {
+    title: "Capacity automation",
+    description: "Help infrastructure capacity changes become more predictable and less manual.",
+    icon: "activity",
+  },
+  {
+    title: "Dependency recovery",
+    description: "Encode known workload dependency recovery patterns into Kubernetes-native automation.",
+    icon: "repeat-2",
+  },
+] as const;
+---
+
+<BaseLayout
+  title="Projects | nowake.ai"
+  description="Active nowake.ai open-source projects and planned infrastructure operations directions."
+>
+  <section class="page-hero grid-paper">
+    <div class="page-shell hero-inner">
+      <p class="eyebrow">Projects</p>
+      <h1>Open-source infrastructure tools with a shared route.</h1>
+      <p>
+        nowake.ai projects are connected by one idea: preserve useful evidence, reduce operational noise, and keep
+        automation inspectable for Kubernetes and cloud-native teams.
+      </p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="#active">
+          <Icon name="arrow-down" class="icon-sm" />
+          View active projects
+        </a>
+        <a class="button button-secondary" href="https://github.com/nowakeai">
+          <Icon name="github" class="icon-sm" />
+          Open GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="active" class="section white-section">
+    <div class="page-shell">
+      <div class="section-head">
+        <p class="section-label">Active</p>
+        <h2>Current work</h2>
+      </div>
+      <div class="project-grid">
+        {
+          activeProjects.map((project) => (
+            <article class="surface project-card">
+              <div class="project-top">
+                <div>
+                  <p class="project-status">{project.status}</p>
+                  <h3>{project.name}</h3>
+                </div>
+                <span class="project-icon">
+                  <Icon name={project.icon} class="icon" />
+                </span>
+              </div>
+              <p class="project-title">{project.title}</p>
+              <p class="project-description">{project.description}</p>
+              <div class="card-actions">
+                <a class="button button-primary" href={project.href}>
+                  Project page
+                </a>
+                <a class="button button-secondary" href={project.repo}>GitHub</a>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="directions" class="section">
+    <div class="page-shell">
+      <div class="soft-panel roadmap-panel">
+        <div class="section-intro">
+          <p class="section-label">Labs / planned directions</p>
+          <h2>Roadmap is public by direction, not by premature project name.</h2>
+          <p>
+            Planned work is grouped by direction until there is a public repository or a stable project page. This keeps
+            the organization clear without over-promising unfinished tools.
+          </p>
+        </div>
+        <div class="direction-grid">
+          {
+            directions.map((direction) => (
+              <article>
+                <Icon name={direction.icon} class="icon accent" />
+                <h3>{direction.title}</h3>
+                <p>{direction.description}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .page-hero {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero-inner {
+    padding-block: 4.5rem;
+  }
+
+  .page-hero h1 {
+    max-width: 62rem;
+    margin: 1.25rem 0 0;
+    font-size: 2.5rem;
+    line-height: 1.08;
+    font-weight: 650;
+  }
+
+  .page-hero p:not(.eyebrow) {
+    max-width: 48rem;
+    margin: 1.5rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 1.125rem;
+    line-height: 1.75;
+  }
+
+  .hero-actions,
+  .card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .section {
+    border-top: 1px solid var(--color-border);
+    padding-block: 4rem;
+  }
+
+  .white-section {
+    background: var(--color-surface);
+  }
+
+  .section-label,
+  .project-status {
+    margin: 0;
+    color: var(--color-accent);
+    font-size: 0.875rem;
+    font-weight: 650;
+  }
+
+  .project-status {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .section-head h2,
+  .section-intro h2 {
+    margin: 0.75rem 0 0;
+    font-size: 1.875rem;
+    line-height: 1.2;
+    font-weight: 650;
+  }
+
+  .section-intro {
+    max-width: 52rem;
+  }
+
+  .section-intro p:last-child {
+    margin: 1rem 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+
+  .project-grid,
+  .direction-grid {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .project-card {
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+  }
+
+  .project-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .project-top h3 {
+    margin: 0.75rem 0 0;
+    font-size: 1.75rem;
+    line-height: 1.15;
+  }
+
+  .project-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  .project-title {
+    margin: 1.25rem 0 0;
+    font-weight: 650;
+  }
+
+  .project-description {
+    margin: 0.75rem 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+
+  .roadmap-panel {
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+  }
+
+  .direction-grid article {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    padding: 1rem;
+  }
+
+  .direction-grid h3 {
+    margin: 1rem 0 0;
+    font-size: 1rem;
+  }
+
+  .direction-grid p {
+    margin: 0.5rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.7;
+  }
+
+  @media (min-width: 768px) {
+    .project-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .direction-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .page-hero h1 {
+      font-size: 3.75rem;
+    }
+  }
+</style>

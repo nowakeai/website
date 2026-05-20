@@ -1,0 +1,101 @@
+---
+import Icon from "./Icons.astro";
+
+const projectItems = [
+  {
+    label: "kube-insight",
+    href: "/projects/kube-insight",
+    description: "Retained Kubernetes evidence for humans and agents.",
+    icon: "database-zap",
+  },
+  {
+    label: "svc-lb-mux",
+    href: "/projects/svc-lb-mux",
+    description: "Service LoadBalancer Multiplexer for shared L4 exposure.",
+    icon: "workflow",
+  },
+];
+
+const navItems = [
+  { label: "Roadmap", href: "/projects#directions" },
+  { label: "Docs", href: "https://docs.nowake.ai" },
+  { label: "Notes", href: "/notes" },
+];
+---
+
+<header class="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-page)_92%,transparent)] backdrop-blur-[14px]">
+  <nav class="page-shell flex items-center justify-between gap-5 py-4" aria-label="Primary">
+    <a class="flex min-h-11 items-center gap-3" href="/" aria-label="nowake.ai home">
+      <span class="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-text)] text-[var(--nw-color-white)]">
+        <Icon name="moon-star" class="icon" />
+      </span>
+      <span class="text-lg font-semibold text-[var(--color-text)]">nowake.ai</span>
+    </a>
+
+    <div class="hidden items-center gap-6 text-sm md:flex">
+      <div class="project-menu group relative">
+        <a
+          class="inline-flex min-h-11 items-center font-medium text-[var(--color-text)] transition-colors hover:text-[var(--color-accent)]"
+          href="/projects"
+          aria-haspopup="true"
+        >
+          Projects
+        </a>
+
+        <div
+          class="project-dropdown invisible pointer-events-none absolute left-1/2 top-full z-50 mt-1 w-[min(26rem,calc(100vw-2rem))] -translate-x-1/2 translate-y-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 opacity-0 shadow-[var(--shadow-surface)] transition duration-150"
+        >
+          <div class="absolute -top-2 left-0 h-2 w-full" aria-hidden="true"></div>
+          <a
+            class="flex items-center justify-between rounded-[var(--radius-sm)] px-3 py-3 font-semibold text-[var(--color-accent)] hover:bg-[var(--color-page)] focus-visible:bg-[var(--color-page)]"
+            href="/projects"
+          >
+            <span>All projects</span>
+            <Icon name="arrow-up-right" class="icon-sm" />
+          </a>
+          <div class="mt-1 grid gap-1 border-t border-[var(--color-border)] pt-2">
+            {
+              projectItems.map((item) => (
+                <a
+                  class="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 rounded-[var(--radius-sm)] px-3 py-3 hover:bg-[var(--color-page)] focus-visible:bg-[var(--color-page)]"
+                  href={item.href}
+                >
+                  <span class="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
+                    <Icon name={item.icon} class="icon-sm" />
+                  </span>
+                  <span class="min-w-0">
+                    <strong class="block text-sm font-semibold text-[var(--color-text)]">{item.label}</strong>
+                    <span class="mt-1 block text-[0.8125rem] leading-5 text-[var(--color-text-muted)]">{item.description}</span>
+                  </span>
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+
+      {navItems.map((item) => <a class="min-h-11 inline-flex items-center font-medium text-[var(--color-text)] transition-colors hover:text-[var(--color-accent)]" href={item.href}>{item.label}</a>)}
+    </div>
+
+    <a class="button button-secondary hidden md:inline-flex" href="https://github.com/nowakeai">
+      <Icon name="github" class="icon-sm" />
+      GitHub
+    </a>
+  </nav>
+
+  <nav class="page-shell flex gap-4 overflow-x-auto pb-3 text-sm md:hidden" aria-label="Mobile primary">
+    <a class="shrink-0 font-medium" href="/projects">Projects</a>
+    {projectItems.map((item) => <a class="shrink-0 text-[var(--color-text-muted)]" href={item.href}>{item.label}</a>)}
+    {navItems.map((item) => <a class="shrink-0 text-[var(--color-text-muted)]" href={item.href}>{item.label}</a>)}
+  </nav>
+</header>
+
+<style>
+  .project-menu:hover .project-dropdown,
+  .project-menu:focus-within .project-dropdown {
+    visibility: visible;
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>

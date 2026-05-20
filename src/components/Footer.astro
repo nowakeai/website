@@ -1,0 +1,185 @@
+---
+import Icon from "./Icons.astro";
+
+const footerGroups = [
+  {
+    title: "Projects",
+    items: [
+      { label: "kube-insight", href: "/projects/kube-insight" },
+      { label: "svc-lb-mux", href: "/projects/svc-lb-mux" },
+      { label: "Roadmap", href: "/projects#directions" },
+    ],
+  },
+  {
+    title: "Resources",
+    items: [
+      { label: "Docs", href: "https://docs.nowake.ai" },
+      { label: "Notes", href: "/notes" },
+      { label: "GitHub", href: "https://github.com/nowakeai" },
+    ],
+  },
+  {
+    title: "Principles",
+    items: [
+      { label: "Evidence before automation" },
+      { label: "Operator control" },
+      { label: "Auditability before magic" },
+    ],
+  },
+  {
+    title: "Labs",
+    items: [
+      { label: "Alert intelligence" },
+      { label: "Access and audit" },
+      { label: "Capacity automation" },
+      { label: "Dependency recovery" },
+    ],
+  },
+];
+---
+
+<footer class="site-footer">
+  <div class="page-shell footer-main">
+    <div>
+      <div class="footer-brand">
+        <span class="footer-mark">
+          <Icon name="moon-star" class="icon-sm" />
+        </span>
+        <span class="footer-brand-name">nowake.ai</span>
+      </div>
+      <p class="footer-copy">Open-source tools for reducing operational noise across Kubernetes and cloud-native infrastructure.</p>
+      <p class="footer-culture">Good night. Sleep tight.</p>
+      <p class="footer-copy small">A culture note about better context, not a promise to hide problems.</p>
+    </div>
+
+    <div class="footer-groups">
+      {
+        footerGroups.map((group) => (
+          <div>
+            <h3>{group.title}</h3>
+            <div class="footer-list">
+              {group.items.map((item) =>
+                item.href ? <a href={item.href}>{item.label}</a> : <span>{item.label}</span>
+              )}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+  <div class="page-shell footer-meta">
+    <span>Built in the open by nowake.ai.</span>
+    <span>Apache-2.0 where applicable.</span>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--footer-border);
+    background: var(--footer-bg);
+    color: var(--footer-text);
+  }
+
+  .footer-main {
+    display: grid;
+    gap: 2rem;
+    padding-block: 2.5rem;
+  }
+
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .footer-mark {
+    width: 2.25rem;
+    height: 2.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  .footer-brand-name {
+    font-size: 1.125rem;
+    font-weight: 650;
+  }
+
+  .footer-copy {
+    max-width: 28rem;
+    margin: 1rem 0 0;
+    color: var(--footer-muted);
+    font-size: 0.875rem;
+    line-height: 1.7;
+  }
+
+  .footer-copy.small {
+    margin-top: 0.5rem;
+  }
+
+  .footer-culture {
+    margin: 1.25rem 0 0;
+    font-family: "Newsreader", Georgia, serif;
+    font-size: 1.5rem;
+    font-style: italic;
+  }
+
+  .footer-groups {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .footer-groups h3 {
+    margin: 0;
+    color: var(--footer-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .footer-list {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .footer-list a:hover {
+    color: var(--color-accent);
+  }
+
+  .footer-list span {
+    color: var(--footer-text);
+  }
+
+  .footer-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-top: 1px solid var(--footer-border);
+    padding-block: 1.25rem;
+    color: var(--footer-muted);
+    font-size: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .footer-groups {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .footer-meta {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .footer-main {
+      grid-template-columns: 1.15fr 2fr;
+    }
+  }
+</style>

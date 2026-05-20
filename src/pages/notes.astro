@@ -1,0 +1,191 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icons.astro";
+
+const noteTypes = [
+  {
+    title: "Design records",
+    text: "Short notes on product direction, interface decisions, and why nowake.ai chooses certain operational boundaries.",
+    icon: "notebook-pen",
+  },
+  {
+    title: "Engineering updates",
+    text: "Progress reports for active projects, especially when changes affect installation, operation, or project scope.",
+    icon: "git-pull-request-arrow",
+  },
+  {
+    title: "Operational patterns",
+    text: "Practical write-ups about Kubernetes evidence, automation safety, access review, and AI-assisted infrastructure work.",
+    icon: "workflow",
+  },
+] as const;
+---
+
+<BaseLayout
+  title="Notes | nowake.ai"
+  description="Engineering notes, design records, and operational writing from nowake.ai."
+>
+  <section class="notes-hero grid-paper">
+    <div class="page-shell hero-inner">
+      <p class="eyebrow">Notes</p>
+      <h1>Engineering notes for practical operations.</h1>
+      <p>
+        This area will collect design records, project updates, and operational patterns behind nowake.ai. The first
+        version stays intentionally small until there is writing worth publishing.
+      </p>
+    </div>
+  </section>
+
+  <section class="section white-section">
+    <div class="page-shell note-grid">
+      {
+        noteTypes.map((item) => (
+          <article class="surface note-card">
+            <Icon name={item.icon} class="icon accent" />
+            <h2>{item.title}</h2>
+            <p>{item.text}</p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="page-shell">
+      <div class="soft-panel empty-state">
+        <div>
+          <p class="section-label">Coming next</p>
+          <h2>Notes will follow the work, not the other way around.</h2>
+          <p>
+            Public writing should explain decisions after they become concrete enough to be useful. Until then, the
+            source repositories and project pages remain the best place to follow implementation.
+          </p>
+        </div>
+        <div class="actions">
+          <a class="button button-primary" href="/projects">
+            <Icon name="folder-open" class="icon-sm" />
+            View projects
+          </a>
+          <a class="button button-secondary" href="https://github.com/nowakeai">
+            <Icon name="github" class="icon-sm" />
+            GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .notes-hero {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero-inner {
+    padding-block: 4.5rem;
+  }
+
+  .notes-hero h1 {
+    max-width: 56rem;
+    margin: 1.25rem 0 0;
+    font-size: 2.5rem;
+    line-height: 1.08;
+    font-weight: 650;
+  }
+
+  .notes-hero p:not(.eyebrow) {
+    max-width: 48rem;
+    margin: 1.5rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 1.125rem;
+    line-height: 1.75;
+  }
+
+  .section {
+    border-top: 1px solid var(--color-border);
+    padding-block: 4rem;
+  }
+
+  .white-section {
+    background: var(--color-surface);
+  }
+
+  .note-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .note-card {
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+  }
+
+  .note-card h2 {
+    margin: 1rem 0 0;
+    font-size: 1.25rem;
+    line-height: 1.25;
+  }
+
+  .note-card p {
+    margin: 0.875rem 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+
+  .empty-state {
+    display: grid;
+    gap: 1.5rem;
+    border-radius: var(--radius-md);
+    padding: 2rem;
+  }
+
+  .section-label {
+    margin: 0;
+    color: var(--color-accent);
+    font-size: 0.875rem;
+    font-weight: 650;
+  }
+
+  .empty-state h2 {
+    margin: 0.75rem 0 0;
+    font-size: 1.75rem;
+    line-height: 1.2;
+  }
+
+  .empty-state p:last-child {
+    max-width: 46rem;
+    margin: 1rem 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-self: end;
+  }
+
+  @media (min-width: 760px) {
+    .note-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 900px) {
+    .empty-state {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero-inner {
+      padding-block: 3.5rem;
+    }
+
+    .notes-hero h1 {
+      font-size: 2rem;
+    }
+  }
+</style>

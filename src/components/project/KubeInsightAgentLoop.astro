@@ -1,0 +1,153 @@
+---
+import Icon from "../Icons.astro";
+
+const loop = [
+  { icon: "database-zap", title: "Schema first", text: "Agents learn the active backend, tables, indexes, and SQL recipes before querying." },
+  { icon: "activity", title: "Coverage check", text: "Collector freshness and resource errors are checked before evidence is trusted." },
+  { icon: "workflow", title: "Candidates", text: "Facts and topology edges narrow the search space without broad live API sweeps." },
+  { icon: "archive", title: "Proof bundle", text: "Retained versions and observations show what the object looked like when it mattered." },
+  { icon: "scan-search", title: "Live compare", text: "kubectl stays useful as a final current-state confirmation path." },
+] as const;
+---
+
+<figure class="agent-loop" aria-label="kube-insight agent investigation loop">
+  <figcaption>
+    <p>Agent path</p>
+    <h3>Give agents an evidence interface, not raw cluster wandering.</h3>
+  </figcaption>
+
+  <div class="loop-track">
+    {
+      loop.map((item, index) => (
+        <article class="loop-card">
+          <div class="loop-index">{String(index + 1).padStart(2, "0")}</div>
+          <div class="loop-icon"><Icon name={item.icon} class="icon-sm" /></div>
+          <h4>{item.title}</h4>
+          <p>{item.text}</p>
+        </article>
+      ))
+    }
+  </div>
+</figure>
+
+<style>
+  .agent-loop {
+    margin: 0;
+  }
+
+  figcaption {
+    max-width: 44rem;
+  }
+
+  figcaption p {
+    margin: 0;
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.8rem;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  figcaption h3 {
+    margin: 0.65rem 0 0;
+    font-size: 1.85rem;
+    line-height: 1.18;
+  }
+
+  .loop-track {
+    position: relative;
+    display: grid;
+    gap: 0.9rem;
+    margin-top: 1.7rem;
+  }
+
+  .loop-track::before {
+    content: "";
+    position: absolute;
+    inset: 2rem auto 2rem 1.35rem;
+    width: 1px;
+    background: var(--color-border-strong);
+  }
+
+  .loop-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.8rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface);
+    padding: 1rem;
+  }
+
+  .loop-index {
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 2.7rem;
+    height: 2.7rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-page);
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.8rem;
+    font-weight: 650;
+  }
+
+  .loop-icon {
+    display: none;
+  }
+
+  .loop-card h4 {
+    margin: 0;
+    align-self: center;
+    font-size: 1rem;
+  }
+
+  .loop-card p {
+    grid-column: 2;
+    margin: 0;
+    color: var(--color-text-muted);
+    line-height: 1.55;
+  }
+
+  @media (min-width: 920px) {
+    .loop-track {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      align-items: stretch;
+    }
+
+    .loop-track::before {
+      inset: 2.2rem 2rem auto;
+      width: auto;
+      height: 1px;
+    }
+
+    .loop-card {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto 1fr;
+      min-height: 15rem;
+    }
+
+    .loop-index {
+      width: 2.35rem;
+      height: 2.35rem;
+    }
+
+    .loop-icon {
+      display: grid;
+      place-items: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: var(--radius-sm);
+      background: var(--color-accent-soft);
+      color: var(--color-accent);
+    }
+
+    .loop-card p {
+      grid-column: auto;
+    }
+  }
+</style>

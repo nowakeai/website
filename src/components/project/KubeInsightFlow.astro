@@ -1,0 +1,359 @@
+---
+import Icon from "../Icons.astro";
+
+const k8sNodes = ["Discovery", "List / Watch"] as const;
+const ingestNodes = [
+  { label: "Filters", text: "redact, normalize, discard", icon: "filter" },
+  { label: "Retained versions", text: "content-addressed JSON", icon: "archive" },
+  { label: "Evidence extraction", text: "facts, edges, changes", icon: "workflow" },
+] as const;
+const storeNodes = ["versions", "facts", "edges", "observations"] as const;
+const readNodes = ["CLI", "HTTP API", "SQL", "MCP tools + prompts"] as const;
+---
+
+<figure class="ki-flow surface" aria-label="kube-insight architecture flowchart">
+  <figcaption class="flow-caption">
+    <div>
+      <p>Architecture flow</p>
+      <h3>Same shape as the project architecture: capture, filter, store, query.</h3>
+    </div>
+    <span>read-only outputs</span>
+  </figcaption>
+
+  <div class="flow-board" aria-label="Capture and query flow">
+    <section class="flow-group k8s-group" aria-label="Kubernetes API">
+      <div class="group-title"><Icon name="box" class="icon-sm" /><span>Kubernetes API</span></div>
+      <div class="node-stack linear">
+        {k8sNodes.map((node) => <div class="flow-node compact"><strong>{node}</strong></div>)}
+      </div>
+    </section>
+
+    <div class="connector main-connector" aria-hidden="true"><span>list/watch</span></div>
+
+    <section class="flow-group ingest-group" aria-label="kube-insight ingestion">
+      <div class="group-title"><Icon name="filter" class="icon-sm" /><span>kube-insight ingestion</span></div>
+      <div class="ingest-layout">
+        <div class="flow-node filter-node">
+          <Icon name={ingestNodes[0].icon} class="icon-sm" />
+          <strong>{ingestNodes[0].label}</strong>
+          <span>{ingestNodes[0].text}</span>
+        </div>
+        <div class="branch-lines" aria-hidden="true"></div>
+        <div class="branch-grid">
+          {ingestNodes.slice(1).map((node) => (
+            <div class="flow-node branch-node">
+              <Icon name={node.icon} class="icon-sm" />
+              <strong>{node.label}</strong>
+              <span>{node.text}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <div class="connector main-connector" aria-hidden="true"><span>write</span></div>
+
+    <section class="flow-group store-group" aria-label="Evidence store">
+      <div class="group-title"><Icon name="database-zap" class="icon-sm" /><span>Evidence store</span></div>
+      <div class="store-grid">
+        {storeNodes.map((node) => <div class="store-node"><strong>{node}</strong></div>)}
+      </div>
+      <p class="store-note">SQLite default / chDB local / ClickHouse central</p>
+    </section>
+
+    <div class="connector main-connector" aria-hidden="true"><span>query</span></div>
+
+    <section class="flow-group read-group" aria-label="Read surfaces">
+      <div class="group-title"><Icon name="scan-search" class="icon-sm" /><span>Read surfaces</span></div>
+      <div class="read-grid">
+        {readNodes.map((node) => <div>{node}</div>)}
+      </div>
+      <div class="flow-node outcome-node">
+        <strong>Investigations</strong>
+        <span>humans, scripts, and agents inspect scoped proof</span>
+      </div>
+    </section>
+  </div>
+</figure>
+
+<style>
+  .ki-flow {
+    margin: 2rem 0 0;
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+  }
+
+  .flow-caption {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 1rem;
+  }
+
+  .flow-caption p,
+  .connector span,
+  .store-note {
+    margin: 0;
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  .flow-caption h3 {
+    margin: 0.5rem 0 0;
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+
+  .flow-caption > span {
+    border-radius: var(--radius-sm);
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    padding: 0.25rem 0.5rem;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.75rem;
+    font-weight: 650;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .flow-board {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+
+  .flow-group {
+    min-width: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-page);
+    padding: 0.9rem;
+  }
+
+  .group-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.7rem;
+    color: var(--color-text);
+    font-weight: 650;
+  }
+
+  .group-title .icon-sm {
+    color: var(--color-accent);
+  }
+
+  .node-stack,
+  .ingest-layout,
+  .store-grid,
+  .read-grid {
+    display: grid;
+    gap: 0.65rem;
+    margin-top: 0.8rem;
+  }
+
+  .linear .flow-node + .flow-node {
+    position: relative;
+  }
+
+  .linear .flow-node + .flow-node::before {
+    content: "";
+    position: absolute;
+    top: -0.65rem;
+    left: 50%;
+    width: 1px;
+    height: 0.65rem;
+    background: var(--color-border-strong);
+  }
+
+  .flow-node,
+  .store-node,
+  .read-grid div {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    padding: 0.8rem;
+  }
+
+  .flow-node {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .flow-node .icon-sm {
+    color: var(--color-accent);
+  }
+
+  .flow-node strong,
+  .store-node strong {
+    display: block;
+    font-size: 0.9rem;
+  }
+
+  .flow-node span {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+
+  .filter-node,
+  .outcome-node {
+    background: var(--color-accent-soft);
+  }
+
+  .branch-lines {
+    position: relative;
+    min-height: 1.1rem;
+  }
+
+  .branch-lines::before,
+  .branch-lines::after {
+    content: "";
+    position: absolute;
+    background: var(--color-border-strong);
+  }
+
+  .branch-lines::before {
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+  }
+
+  .branch-lines::after {
+    left: 25%;
+    right: 25%;
+    top: 50%;
+    height: 1px;
+  }
+
+  .branch-grid {
+    display: grid;
+    gap: 0.65rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .branch-node:nth-child(2) {
+    background: var(--color-signal-soft);
+  }
+
+  .store-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .store-node {
+    text-align: center;
+  }
+
+  .store-note {
+    margin-top: 0.75rem;
+    color: var(--color-text-muted);
+    line-height: 1.45;
+  }
+
+  .read-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .read-grid div {
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    font-weight: 650;
+    text-align: center;
+  }
+
+  .connector {
+    position: relative;
+    min-height: 1.6rem;
+    display: grid;
+    place-items: center;
+  }
+
+  .connector::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: var(--color-border-strong);
+  }
+
+  .connector::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: calc(50% - 0.25rem);
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 1px solid var(--color-border-strong);
+    border-bottom: 1px solid var(--color-border-strong);
+    transform: rotate(45deg);
+  }
+
+  .connector span {
+    position: relative;
+    z-index: 1;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.2rem 0.45rem;
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 1080px) {
+    .flow-board {
+      grid-template-columns: minmax(9rem, 0.75fr) 2.1rem minmax(16rem, 1.3fr) 2.1rem minmax(15rem, 1.15fr) 2.1rem minmax(12rem, 0.95fr);
+      align-items: stretch;
+    }
+
+    .connector {
+      min-height: auto;
+    }
+
+    .connector::before {
+      top: 50%;
+      bottom: auto;
+      left: 0;
+      right: 0;
+      width: auto;
+      height: 1px;
+    }
+
+    .connector::after {
+      top: calc(50% - 0.25rem);
+      bottom: auto;
+      left: auto;
+      right: 0;
+      transform: rotate(-45deg);
+    }
+
+    .connector span {
+      font-size: 0.65rem;
+      padding-inline: 0.35rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .flow-caption {
+      flex-direction: column;
+    }
+
+    .branch-grid,
+    .store-grid,
+    .read-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .branch-lines::after {
+      display: none;
+    }
+  }
+</style>

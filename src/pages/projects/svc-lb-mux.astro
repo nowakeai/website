@@ -1,0 +1,329 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Icon from "../../components/Icons.astro";
+
+const valueStats = [
+  { value: "1 mux", label: "can front many compatible LoadBalancer Services" },
+  { value: "100 ports", label: "GKE-oriented cap per mux with default chart values" },
+  { value: "Native API", label: "control-plane only; no extra data-plane hop" },
+] as const;
+
+const scenarioCards = [
+  {
+    title: "Many small TCP/UDP Services",
+    text: "A cluster exposes many small services, each needing a stable external L4 endpoint. Paying for one cloud load balancer per Service becomes wasteful.",
+    signal: "cost surface",
+  },
+  {
+    title: "Quota-constrained clusters",
+    text: "Forwarding rules, IP addresses, load balancers, or provider-specific port limits become the bottleneck before the workload itself does.",
+    signal: "quota pressure",
+  },
+  {
+    title: "Service workflow must stay familiar",
+    text: "Application teams still create normal LoadBalancer Services. The mux handles shared provider exposure behind that Kubernetes-native API.",
+    signal: "ops fit",
+  },
+] as const;
+
+const operatingRows = [
+  { title: "Mux Service", detail: "Selectorless type: LoadBalancer Service. It owns the provider-facing L4 load balancer, runtime ports, and ingress status." },
+  { title: "Channel Service", detail: "Application-facing type: LoadBalancer Service. It points at a mux through spec.loadBalancerClass and keeps stable named ports." },
+  { title: "Control-plane only", detail: "The controller configures native Kubernetes Services and Endpoints. It does not proxy traffic or sit in the data path." },
+  { title: "Port ownership", detail: "Static and auto-assigned mux port claims are persisted per mux in a controller-owned ConfigMap." },
+  { title: "GitOps boundary", detail: "GitOps should manage desired config and ignore controller-owned mux spec.ports so the controller can reconcile active channels." },
+] as const;
+
+const providerRows = [
+  { provider: "GKE", status: "Actively validated", note: "Defaults target external passthrough Network Load Balancers. One mux is capped at 100 Service ports to stay inside GKE-native behavior." },
+  { provider: "EKS", status: "Supported guide", note: "AWS NLB setup is documented. Provider-specific validation should still be repeated in the target environment." },
+  { provider: "Other providers", status: "Experimental", note: "The core model is Kubernetes-native, but cloud load balancer behavior, limits, and port handling vary by provider." },
+] as const;
+
+const roadmapItems = [
+  "EndpointSlice support for larger channel sets and clearer backend state.",
+  "Provider validation reports for GKE, EKS, and additional Kubernetes environments.",
+  "Debug UI rewrite with safer auth, modular diagnostics, and operator-focused topology views.",
+] as const;
+---
+
+<BaseLayout
+  title="svc-lb-mux | nowake.ai"
+  description="Service LoadBalancer Multiplexer lets many Kubernetes LoadBalancer Services share one provider-managed Layer 4 load balancer."
+>
+  <section class="mux-hero grid-paper">
+    <div class="page-shell mux-hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Active / controller</p>
+        <h1>svc-lb-mux</h1>
+        <p class="full-name">Service LoadBalancer Multiplexer</p>
+        <p class="mux-tagline">Expose many L4 Services without paying for one cloud load balancer each.</p>
+        <p class="mux-description">
+          svc-lb-mux is for platform and operations teams that need to expose many TCP/UDP services, but do not want every
+          application-facing <code>LoadBalancer</code> Service to create another provider L4 load balancer, IP, forwarding rule,
+          and recurring cost line.
+        </p>
+
+        <div class="value-strip" aria-label="svc-lb-mux value highlights">
+          {valueStats.map((item) => <div><strong>{item.value}</strong><span>{item.label}</span></div>)}
+        </div>
+
+        <div class="hero-actions">
+          <a class="button button-primary" href="https://github.com/nowakeai/svc-lb-mux">
+            <Icon name="github" class="icon-sm" />
+            GitHub
+          </a>
+          <a class="button button-secondary" href="https://github.com/nowakeai/svc-lb-mux/tree/main/docs">
+            <Icon name="book-open" class="icon-sm" />
+            Docs
+          </a>
+        </div>
+      </div>
+
+      <aside class="surface consolidation-card" aria-label="LoadBalancer consolidation diagram">
+        <div class="panel-header">
+          <span>lb.consolidation</span>
+          <span>cost + quota</span>
+        </div>
+        <div class="compare-grid">
+          <section class="before-flow" aria-label="Default cloud provider behavior">
+            <h2>Default</h2>
+            <div class="mini-services">
+              <span>svc-a</span><span>svc-b</span><span>svc-c</span><span>svc-d</span>
+            </div>
+            <div class="flow-arrow">each asks provider</div>
+            <div class="lb-stack">
+              <span>LB</span><span>LB</span><span>LB</span><span>LB</span>
+            </div>
+            <p>more IPs, forwarding rules, quotas, and recurring LB cost</p>
+          </section>
+
+          <section class="after-flow" aria-label="svc-lb-mux behavior">
+            <h2>With svc-lb-mux</h2>
+            <div class="mini-services channels">
+              <span>channel-a</span><span>channel-b</span><span>channel-c</span><span>channel-d</span>
+            </div>
+            <div class="flow-arrow">share one mux</div>
+            <div class="mux-block"><Icon name="workflow" class="icon-sm" /><strong>mux Service</strong></div>
+            <div class="shared-lb"><Icon name="box" class="icon-sm" /><strong>1 provider L4 LB</strong></div>
+            <p>same Service workflow, consolidated provider exposure</p>
+          </section>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section white-section scenario-section">
+    <div class="page-shell scenario-layout">
+      <div class="section-intro sticky-copy">
+        <p class="section-label">Use it when</p>
+        <h2>The problem is not ingress. It is too many L4 load balancers.</h2>
+        <p>
+          This is a narrow tool by design. It is useful when the workload really needs provider Layer 4 exposure and the
+          cluster has many small services, many public ports, or a provider quota/cost ceiling that appears before the
+          application does.
+        </p>
+      </div>
+      <div class="scenario-cards">
+        {scenarioCards.map((item) => (
+          <article class="surface scenario-card">
+            <span>{item.signal}</span>
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section mechanics-section">
+    <div class="page-shell mechanics-layout">
+      <div>
+        <p class="section-label">How it works</p>
+        <h2>Mux owns the provider edge. Channels stay the app-facing API.</h2>
+        <p>
+          A mux Service is the single provider-facing LoadBalancer. Channel Services remain normal Kubernetes Services,
+          but their <code>spec.loadBalancerClass</code> points at the mux instead of asking the cloud provider for another LB.
+        </p>
+      </div>
+
+      <div class="topology-frame surface" aria-label="svc-lb-mux topology flow">
+        <div class="topology-row external-row"><div>Clients</div><span></span><div>Provider L4 LB</div></div>
+        <div class="topology-arrow"></div>
+        <div class="topology-row mux-row"><div>Mux Service</div><span>selectorless LoadBalancer</span><div>controller-owned ports</div></div>
+        <div class="split-lines" aria-hidden="true"><span></span><span></span></div>
+        <div class="topology-row channel-row"><div>Channel A</div><div>Channel B</div></div>
+        <div class="topology-row pod-row"><div>Pods A</div><div>Pods B</div></div>
+        <div class="control-loop"><Icon name="git-pull-request-arrow" class="icon-sm" /> controller syncs mux ports, endpoints, and status.loadBalancer.ingress</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section white-section operating-section">
+    <div class="page-shell operating-layout">
+      <div>
+        <p class="section-label">Operating model</p>
+        <h2>Plain Kubernetes objects, with clear ownership boundaries.</h2>
+      </div>
+      <div class="operating-table">
+        {operatingRows.map((row) => <article><strong>{row.title}</strong><p>{row.detail}</p></article>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section provider-section">
+    <div class="page-shell provider-layout">
+      <div class="section-intro">
+        <p class="section-label">Provider reality</p>
+        <h2>Cloud L4 behavior matters. The page should say so.</h2>
+        <p>
+          svc-lb-mux deliberately stays inside provider-managed Service LoadBalancer behavior. That keeps the normal path
+          Kubernetes-native, but provider limits still define the safe operating envelope.
+        </p>
+      </div>
+      <div class="provider-grid">
+        {providerRows.map((row) => (
+          <article class="surface provider-card">
+            <div><strong>{row.provider}</strong><span>{row.status}</span></div>
+            <p>{row.note}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section white-section roadmap-section">
+    <div class="page-shell roadmap-layout">
+      <div>
+        <p class="section-label">Current focus</p>
+        <h2>Useful today for compatible workloads, still being hardened across providers.</h2>
+        <p>
+          The controller is intentionally small. Follow-up work is focused on larger backend state, repeatable provider
+          validation, GitOps hardening, and better operator diagnostics.
+        </p>
+      </div>
+      <div class="roadmap-list">
+        {roadmapItems.map((item) => <div><Icon name="shield-check" class="icon-sm accent" /><span>{item}</span></div>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section white-section next-section">
+    <div class="page-shell">
+      <div class="soft-panel quickstart">
+        <div>
+          <p class="section-label">Next steps</p>
+          <h2>Start with the provider guide and one mux.</h2>
+          <p>
+            The repository includes Helm install docs, channel Service examples, GKE and AWS setup guides, GitOps notes,
+            troubleshooting, and controller design details.
+          </p>
+        </div>
+        <div class="quick-actions">
+          <a class="button button-primary" href="https://github.com/nowakeai/svc-lb-mux">
+            <Icon name="github" class="icon-sm" />
+            Open GitHub
+          </a>
+          <a class="button button-secondary" href="https://github.com/nowakeai/svc-lb-mux/tree/main/docs/gke-lb-setup.md">
+            <Icon name="book-open" class="icon-sm" />
+            GKE guide
+          </a>
+          <a class="button button-secondary" href="https://github.com/nowakeai/svc-lb-mux/blob/main/docs/channel-services.md">
+            <Icon name="workflow" class="icon-sm" />
+            Channel manual
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .mux-hero { border-bottom: 1px solid var(--color-border); }
+  .mux-hero-grid { display: grid; gap: 2.5rem; padding-block: 4.5rem; }
+  .hero-copy { min-width: 0; }
+  .mux-hero h1 { margin: 1.25rem 0 0; font-size: clamp(3rem, 7vw, 6.5rem); line-height: 0.92; font-weight: 650; letter-spacing: 0; }
+  .full-name { margin: 0.7rem 0 0; color: var(--color-accent); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.95rem; font-weight: 650; text-transform: uppercase; }
+  .mux-tagline { max-width: 52rem; margin: 1.25rem 0 0; font-size: clamp(1.45rem, 3vw, 2.45rem); line-height: 1.12; font-weight: 650; }
+  .mux-description { max-width: 52rem; margin: 1.25rem 0 0; color: var(--color-text-muted); font-size: 1.08rem; line-height: 1.75; }
+  .mux-description code, .mechanics-layout code { color: var(--color-text); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.95em; }
+  .hero-actions, .quick-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+  .value-strip { display: grid; gap: 0.75rem; margin-top: 1.5rem; }
+  .value-strip div { border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface); padding: 1rem; }
+  .value-strip strong { display: block; color: var(--color-signal); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 1rem; }
+  .value-strip span { display: block; margin-top: 0.35rem; color: var(--color-text-muted); font-size: 0.8125rem; line-height: 1.45; }
+
+  .consolidation-card { align-self: center; border-radius: var(--radius-md); padding: 1.15rem; }
+  .panel-header { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; color: var(--color-text-muted); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.75rem; font-weight: 650; text-transform: uppercase; }
+  .panel-header span:last-child { color: var(--color-signal); }
+  .compare-grid { display: grid; gap: 1rem; margin-top: 1rem; }
+  .compare-grid section { border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-page); padding: 1rem; }
+  .compare-grid h2 { margin: 0; font-size: 1rem; }
+  .mini-services, .lb-stack { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.45rem; margin-top: 0.9rem; }
+  .mini-services span, .lb-stack span, .mux-block, .shared-lb { border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface); padding: 0.65rem; text-align: center; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.75rem; font-weight: 650; }
+  .lb-stack span { background: #fff1f2; color: #9f1239; }
+  .channels span, .mux-block, .shared-lb { background: var(--color-signal-soft); color: var(--color-text); }
+  .flow-arrow { margin: 0.75rem 0; color: var(--color-text-muted); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; text-align: center; text-transform: uppercase; }
+  .mux-block, .shared-lb { display: flex; align-items: center; justify-content: center; gap: 0.45rem; margin-top: 0.75rem; }
+  .compare-grid p { margin: 0.85rem 0 0; color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.55; }
+
+  .section { border-top: 1px solid var(--color-border); padding-block: 4rem; }
+  .white-section { background: var(--color-surface); }
+  .section-label { margin: 0; color: var(--color-accent); font-size: 0.875rem; font-weight: 650; }
+  .section h2 { margin: 0.75rem 0 0; font-size: clamp(1.8rem, 3vw, 2.65rem); line-height: 1.1; font-weight: 650; }
+  .section-intro p:last-child, .mechanics-layout > div > p, .roadmap-layout > div > p, .quickstart p:last-child { margin: 1rem 0 0; color: var(--color-text-muted); line-height: 1.75; }
+  .scenario-layout, .mechanics-layout, .operating-layout, .provider-layout, .roadmap-layout, .quickstart { display: grid; gap: 2rem; }
+  .scenario-cards, .operating-table, .provider-grid, .roadmap-list { display: grid; gap: 0.85rem; }
+  .scenario-card { border-radius: var(--radius-md); padding: 1.4rem; }
+  .scenario-card span { color: var(--color-accent); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.75rem; font-weight: 650; text-transform: uppercase; }
+  .scenario-card h3 { margin: 0.75rem 0 0; font-size: 1.2rem; }
+  .scenario-card p { margin: 0.7rem 0 0; color: var(--color-text-muted); line-height: 1.65; }
+
+  .topology-frame { border-radius: var(--radius-md); padding: 1.15rem; }
+  .topology-row { display: grid; gap: 0.65rem; align-items: center; }
+  .external-row, .channel-row, .pod-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .topology-row div, .topology-row > span, .control-loop { border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-page); padding: 0.85rem; text-align: center; font-weight: 650; }
+  .external-row span { display: none; }
+  .mux-row { grid-template-columns: minmax(0, 1fr); margin-top: 0.65rem; }
+  .mux-row div, .mux-row span { background: var(--color-signal-soft); }
+  .mux-row span, .control-loop { color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.45; }
+  .topology-arrow { width: 1px; height: 1.2rem; margin: 0.5rem auto; background: var(--color-border-strong); }
+  .split-lines { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; margin: 0.55rem 0; }
+  .split-lines span { height: 1rem; border-inline: 1px solid var(--color-border-strong); border-top: 1px solid var(--color-border-strong); }
+  .pod-row { margin-top: 0.65rem; }
+  .pod-row div { font-size: 0.82rem; }
+  .control-loop { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 0.85rem; border-style: dashed; }
+
+  .operating-table article, .provider-card, .roadmap-list div { border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-page); padding: 1rem; }
+  .operating-table article { display: grid; gap: 0.4rem; }
+  .operating-table strong { font-size: 1rem; }
+  .operating-table p, .provider-card p { margin: 0; color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.65; }
+  .provider-card div { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+  .provider-card span { color: var(--color-signal); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; font-weight: 650; text-transform: uppercase; }
+  .provider-card p { margin-top: 0.7rem; }
+  .roadmap-list div { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.75rem; align-items: start; color: var(--color-text-muted); line-height: 1.6; }
+  .quickstart { border-radius: var(--radius-md); padding: 2rem; }
+
+  @media (min-width: 760px) {
+    .compare-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .scenario-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .operating-table { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .provider-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .mux-row { grid-template-columns: 1fr 1fr 1fr; }
+    .external-row { grid-template-columns: 1fr auto 1fr; }
+    .external-row span { display: block; height: 1px; min-width: 4rem; background: var(--color-border-strong); padding: 0; border: 0; }
+  }
+
+  @media (min-width: 980px) {
+    .mux-hero-grid { grid-template-columns: minmax(0, 0.95fr) minmax(28rem, 0.85fr); padding-block: 5rem; }
+    .scenario-layout, .mechanics-layout, .operating-layout, .roadmap-layout { grid-template-columns: minmax(0, 0.72fr) minmax(28rem, 1fr); align-items: start; }
+    .provider-layout { grid-template-columns: minmax(0, 0.8fr) minmax(26rem, 1.1fr); align-items: start; }
+    .provider-layout .provider-grid { grid-column: 2; grid-row: 1; grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 640px) {
+    .mux-hero-grid { padding-block: 3.5rem; }
+    .external-row, .channel-row, .pod-row { grid-template-columns: 1fr; }
+    .split-lines { display: none; }
+  }
+</style>

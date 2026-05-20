@@ -1,0 +1,332 @@
+---
+import StorageLogo from "./StorageLogo.astro";
+
+const workflowRows = [
+  { scenario: "PolicyViolation Event count", insight: "215 ms", kubectl: "3,214 ms", speedup: "14.9x" },
+  { scenario: "Event to affected resource", insight: "26 ms", kubectl: "3,307 ms", speedup: "127.2x" },
+  { scenario: "Event keyword search", insight: "24 ms", kubectl: "3,794 ms", speedup: "158.1x" },
+  { scenario: "Service topology candidates", insight: "32 ms", kubectl: "3,104 ms", speedup: "97.0x" },
+  { scenario: "Workload scope inventory", insight: "26 ms", kubectl: "5,745 ms", speedup: "221.0x" },
+] as const;
+
+const storageRows = [
+  { backend: "SQLite", logo: "sqlite", fit: "smallest local start", ingest: "17.42 s", service: "80.6 ms", storage: "4.61 MB DB" },
+  { backend: "ClickHouse", logo: "clickhouse", fit: "central history", ingest: "7.91 s", service: "182.0 ms", storage: "597 KiB active, ~4.9x" },
+  { backend: "chDB", logo: "chdb", fit: "local ClickHouse shape", ingest: "1.52 s", service: "506.9 ms", storage: "1.23 MB dir, ~5.7x" },
+] as const;
+---
+
+<figure class="ki-performance surface" aria-label="kube-insight performance and storage validation summary">
+  <figcaption>
+    <div>
+      <p>Validation profile</p>
+      <h3>Evidence queries stay small because the joins are already shaped.</h3>
+    </div>
+    <span>2026-05-18</span>
+  </figcaption>
+
+  <div class="perf-highlights" aria-label="Performance summary">
+    <article>
+      <span>agent query phase</span>
+      <strong>24-215 ms</strong>
+      <p>Five retained-evidence workflows over SQLite evidence.</p>
+    </article>
+    <article>
+      <span>raw kubectl baseline</span>
+      <strong>3,104-5,745 ms</strong>
+      <p>Comparable broad live calls reconstructing the same context.</p>
+    </article>
+    <article>
+      <span>live service case</span>
+      <strong>448.746 ms vs 3,462.546 ms</strong>
+      <p>ClickHouse SQL/API path used 3 operations; raw kubectl used 4 calls.</p>
+    </article>
+  </div>
+
+  <section class="perf-block" aria-label="Agent workflow comparison">
+    <div class="block-head">
+      <div>
+        <p>Agent workflow benchmark</p>
+        <h4>Retained evidence vs broad live kubectl</h4>
+      </div>
+      <span>14.9x-221x</span>
+    </div>
+    <div class="workflow-table" role="table" aria-label="kube-insight versus kubectl workflow timings">
+      <div class="table-row table-head" role="row">
+        <span role="columnheader">Scenario</span>
+        <span role="columnheader">kube-insight</span>
+        <span role="columnheader">kubectl</span>
+        <span role="columnheader">Speedup</span>
+      </div>
+      {
+        workflowRows.map((row) => (
+          <div class="table-row" role="row">
+            <strong role="cell">{row.scenario}</strong>
+            <span role="cell">{row.insight}</span>
+            <span role="cell">{row.kubectl}</span>
+            <em role="cell">{row.speedup}</em>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="perf-block" aria-label="Storage mode benchmark">
+    <div class="block-head compact">
+      <div>
+        <p>Same-dataset storage harness</p>
+        <h4>Choose by operating model, not a single latency number.</h4>
+      </div>
+    </div>
+    <div class="storage-grid">
+      {
+        storageRows.map((row) => (
+          <article>
+            <div class="storage-card-head">
+              <StorageLogo name={row.logo} />
+              <div>
+                <span>{row.fit}</span>
+                <h5>{row.backend}</h5>
+              </div>
+            </div>
+            <dl>
+              <div><dt>ingest</dt><dd>{row.ingest}</dd></div>
+              <div><dt>service</dt><dd>{row.service}</dd></div>
+              <div><dt>storage</dt><dd>{row.storage}</dd></div>
+            </dl>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</figure>
+
+<style>
+  .ki-performance {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    border-radius: var(--radius-md);
+    padding: 1.1rem;
+  }
+
+  .perf-block,
+  .workflow-table {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 1rem;
+  }
+
+  figcaption p,
+  .block-head p,
+  .perf-highlights span,
+  .storage-grid article > span,
+  .storage-card-head span,
+  dt {
+    margin: 0;
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  figcaption h3 {
+    max-width: 34rem;
+    margin: 0.45rem 0 0;
+    font-size: 1.2rem;
+    line-height: 1.2;
+  }
+
+  figcaption > span,
+  .block-head > span {
+    align-self: flex-start;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    padding: 0.45rem 0.6rem;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  .perf-highlights {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .perf-highlights article {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-page);
+    padding: 0.9rem;
+  }
+
+  .perf-highlights strong {
+    display: block;
+    margin-top: 0.45rem;
+    color: var(--color-text);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  .perf-highlights p {
+    margin: 0.45rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .perf-block {
+    margin-top: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-page);
+    padding: 0.9rem;
+  }
+
+  .block-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.8rem;
+  }
+
+  .block-head.compact {
+    padding-bottom: 0.65rem;
+  }
+
+  .block-head h4 {
+    margin: 0.35rem 0 0;
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  .workflow-table {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: minmax(13rem, 1.4fr) minmax(5rem, 0.6fr) minmax(5rem, 0.6fr) minmax(4.5rem, 0.45fr);
+    gap: 0.75rem;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.62rem 0;
+  }
+
+  .table-row:last-child {
+    border-bottom: 0;
+  }
+
+  .table-head {
+    color: var(--color-text-muted);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.7rem;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  .table-row strong {
+    font-size: 0.85rem;
+  }
+
+  .table-row span,
+  .table-row em {
+    color: var(--color-text-muted);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.8rem;
+    font-style: normal;
+    text-align: right;
+  }
+
+  .table-row em {
+    color: var(--color-signal);
+    font-weight: 650;
+  }
+
+  .storage-grid {
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .storage-grid article {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    padding: 0.8rem;
+  }
+
+  .storage-card-head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .storage-grid h5 {
+    margin: 0.3rem 0 0;
+    font-size: 1rem;
+  }
+
+  .storage-grid dl {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0.7rem 0 0;
+  }
+
+  .storage-grid dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    border-top: 1px solid var(--color-border);
+    padding-top: 0.35rem;
+  }
+
+  dt {
+    color: var(--color-text-muted);
+    font-size: 0.67rem;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--color-text);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.76rem;
+    text-align: right;
+  }
+
+  @media (min-width: 760px) {
+    .perf-highlights,
+    .storage-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 760px) {
+    figcaption,
+    .block-head {
+      flex-direction: column;
+    }
+
+    .workflow-table {
+      overflow-x: auto;
+      padding-bottom: 0.2rem;
+    }
+
+    .table-row {
+      min-width: 40rem;
+    }
+  }
+</style>

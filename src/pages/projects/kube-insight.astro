@@ -1,0 +1,726 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Icon from "../../components/Icons.astro";
+import KubeInsightFlow from "../../components/project/KubeInsightFlow.astro";
+import KubeInsightPerformance from "../../components/project/KubeInsightPerformance.astro";
+import KubeInsightUseCases from "../../components/project/KubeInsightUseCases.astro";
+import StorageLogo from "../../components/project/StorageLogo.astro";
+
+const evidenceTables = [
+  { name: "versions", text: "content-addressed retained JSON" },
+  { name: "facts", text: "status, events, RBAC, rollout, webhook, cert facts" },
+  { name: "edges", text: "Service, EndpointSlice, owner, policy, and event relationships" },
+  { name: "observations", text: "watch/list timestamps and coverage signals" },
+] as const;
+
+const modes = [
+  { name: "SQLite", logo: "sqlite", role: "default local", stat: "smallest start", text: "A pure-Go default artifact with one local evidence database for first captures, laptops, CI fixtures, and local agent workflows." },
+  { name: "chDB", logo: "chdb", role: "local ClickHouse shape", stat: "embedded analytics", text: "A chDB-enabled artifact when you want ClickHouse-compatible local tables without operating a ClickHouse server." },
+  { name: "ClickHouse", logo: "clickhouse", role: "central history", stat: "team service", text: "A continuous evidence service for append-heavy history, compression, API/MCP reads, and future cold-tiering work." },
+] as const;
+
+const heroStats = [
+  { value: "24-215 ms", label: "five retained-evidence agent workflow queries" },
+  { value: "14.9x-221x", label: "faster than comparable broad kubectl paths" },
+  { value: "auto-redaction", label: "configurable filters and extractors keep sensitive data out of evidence" },
+] as const;
+
+const productCards = [
+  { icon: "archive", title: "Keep the state that disappeared", text: "Events expire, Pods restart, EndpointSlices change, and deleted objects vanish from the apiserver. kube-insight keeps observed versions and timestamps so the old state can still be inspected." },
+  { icon: "workflow", title: "Turn raw history into queryable clues", text: "Extracted facts, changes, and topology edges let operators and agents rank candidate Services, Pods, Events, owners, RBAC, webhooks, and policies before opening full JSON proof." },
+  { icon: "shield-check", title: "Reduce the agent blast radius", text: "Configurable filters and extractors redact sensitive data before storage. Future service mode will inherit Kubernetes RBAC so agents see only what they are allowed to inspect." },
+] as const;
+---
+
+<BaseLayout
+  title="kube-insight | nowake.ai"
+  description="kube-insight captures sanitized Kubernetes history and exposes retained evidence through read-only SQL, API, and MCP surfaces."
+>
+  <section class="ki-product-hero grid-paper">
+    <div class="page-shell hero-layout">
+      <div class="hero-copy">
+        <p class="eyebrow">Active / flagship</p>
+        <h1>kube-insight</h1>
+        <p class="hero-tagline">The missing history layer for Kubernetes AIOps.</p>
+        <p class="hero-description">
+          Logs have search systems. Metrics have time-series stores. Traces preserve application flows. Kubernetes
+          infrastructure state is still too often reduced to <strong>whatever the apiserver shows right now</strong>. kube-insight turns that
+          gap into an AIOps foundation: it records Kubernetes resource history at <strong>low operational cost</strong>, extracts facts and
+          topology, and exposes <strong>human- and agent-friendly query surfaces</strong>. Agents can work from <strong>retained evidence</strong> first,
+          then use live <code>kubectl</code> only for final confirmation instead of rebuilding context from scratch.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button button-primary" href="https://github.com/nowakeai/kube-insight">
+            <Icon name="github" class="icon-sm" />
+            GitHub
+          </a>
+          <a class="button button-secondary" href="https://github.com/nowakeai/kube-insight/tree/main/docs">
+            <Icon name="book-open" class="icon-sm" />
+            Docs
+          </a>
+        </div>
+      </div>
+
+      <aside class="hero-console" aria-label="kube-insight product highlights">
+        <div class="console-header">
+          <span>agent.workflow</span>
+          <span>retained proof</span>
+        </div>
+        <div class="agent-sequence" aria-label="Agent investigation sequence">
+          <div class="participants" aria-hidden="true">
+            <span>Agent</span>
+            <span>MCP</span>
+            <span>Evidence DB</span>
+            <span>K8s API</span>
+          </div>
+          <div class="sequence-row agent-to-mcp">
+            <span>kube_insight_schema</span>
+          </div>
+          <div class="sequence-row mcp-to-db">
+            <span>backend notes, tables, recipes</span>
+          </div>
+          <div class="sequence-row db-to-agent">
+            <span>schema + SQL recipes</span>
+          </div>
+          <div class="sequence-row agent-to-db">
+            <span>coverage, facts, edges</span>
+          </div>
+          <div class="sequence-row db-to-agent proof-row">
+            <span>ranked candidates + proof bundle</span>
+          </div>
+          <div class="sequence-row agent-to-kube optional-row">
+            <span>optional kubectl comparison</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="metrics-band" aria-label="kube-insight core selling points">
+    <div class="page-shell metrics-grid">
+      {heroStats.map((item) => <article><strong>{item.value}</strong><span>{item.label}</span></article>)}
+    </div>
+  </section>
+
+  <section class="section white-section">
+    <div class="page-shell attraction-layout">
+      <div class="section-intro sticky-copy">
+        <p class="section-label">Why it matters</p>
+        <h2>Current state is useful. It is not the whole story.</h2>
+        <p>
+          <code>kubectl</code> is still the live-state baseline, but many incidents are already gone by the time someone investigates: Events expire, rollouts are reverted, RBAC edits are fixed, EndpointSlices move, and Pods are replaced. kube-insight keeps the missing Kubernetes evidence and shapes it into fast, scoped investigation paths.
+        </p>
+        <div class="why-contrast" aria-label="kube-insight investigation contrast">
+          <div><span>without history</span><strong>current objects only</strong></div>
+          <div><span>with kube-insight</span><strong>versions, facts, edges, observations</strong></div>
+        </div>
+      </div>
+      <div class="product-card-grid">
+        {
+          productCards.map((card) => (
+            <article class="product-card">
+              <Icon name={card.icon} class="icon-sm" />
+              <h3>{card.title}</h3>
+              <p>{card.text}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section performance-section">
+    <div class="page-shell performance-layout">
+      <div class="section-intro">
+        <p class="section-label">Performance</p>
+        <h2>Measured as investigation workflows, not isolated database tricks.</h2>
+        <p>
+          The validation compares retained evidence against broad live <code>kubectl</code> paths, then separates SQLite,
+          ClickHouse, and chDB tradeoffs. The product claim is focused: pre-extracted evidence makes AIOps workflows
+          faster and more repeatable before the final live-state check.
+        </p>
+      </div>
+      <KubeInsightPerformance />
+    </div>
+  </section>
+
+  <section class="section white-section">
+    <div class="page-shell">
+      <KubeInsightUseCases />
+    </div>
+  </section>
+
+  <section class="section architecture-section">
+    <div class="page-shell architecture-layout">
+      <div class="section-intro">
+        <p class="section-label">Architecture</p>
+        <h2>Facts and edges are the candidate path. Versions are the proof.</h2>
+        <p>
+          Kubernetes data is captured once, filtered before storage, extracted into investigation tables, then served
+          through narrow read surfaces: CLI, HTTP API, read-only SQL, MCP tools, and agent prompts.
+        </p>
+      </div>
+
+      <KubeInsightFlow />
+    </div>
+  </section>
+
+  <section class="section white-section">
+    <div class="page-shell evidence-layout">
+      <div class="section-intro">
+        <p class="section-label">Evidence model</p>
+        <h2>Small tables, useful answers.</h2>
+      </div>
+      <div class="ledger-grid" aria-label="kube-insight retained evidence tables">
+        {evidenceTables.map((item) => <article><strong>{item.name}</strong><span>{item.text}</span></article>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section modes-section">
+    <div class="page-shell">
+      <div class="section-intro compact">
+        <p class="section-label">Storage modes</p>
+        <h2>Start local. Keep history central when the team needs it.</h2>
+      </div>
+      <div class="mode-table">
+        {modes.map((mode) => (
+          <article>
+            <div class="mode-head">
+              <StorageLogo name={mode.logo} size="lg" />
+              <div>
+                <span>{mode.role}</span>
+                <strong>{mode.stat}</strong>
+              </div>
+            </div>
+            <h3>{mode.name}</h3>
+            <p>{mode.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section white-section">
+    <div class="page-shell">
+      <div class="soft-panel quickstart">
+        <div>
+          <p class="section-label">Next steps</p>
+          <h2>Start with the repository quickstart and storage notes.</h2>
+          <p>
+            Installation, MCP usage, SQL recipes, security, retention, and storage-mode tradeoffs are kept in project
+            documentation so the website can stay focused on product shape.
+          </p>
+        </div>
+        <div class="quick-actions">
+          <a class="button button-primary" href="https://github.com/nowakeai/kube-insight">
+            <Icon name="github" class="icon-sm" />
+            Open GitHub
+          </a>
+          <a class="button button-secondary" href="https://github.com/nowakeai/kube-insight/tree/main/docs">
+            <Icon name="book-open" class="icon-sm" />
+            Read Docs
+          </a>
+          <a class="button button-secondary" href="/projects">
+            <Icon name="folder-open" class="icon-sm" />
+            All projects
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ki-product-hero {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero-layout {
+    display: grid;
+    gap: 2.5rem;
+    padding-block: 4.75rem 3.5rem;
+  }
+
+  .hero-copy {
+    align-self: center;
+  }
+
+  .ki-product-hero h1 {
+    margin: 1.2rem 0 0;
+    font-size: 3rem;
+    line-height: 1;
+    font-weight: 650;
+  }
+
+  .hero-tagline {
+    max-width: 48rem;
+    margin: 1rem 0 0;
+    font-size: 1.5rem;
+    font-weight: 650;
+    line-height: 1.25;
+  }
+
+  .hero-description {
+    max-width: 50rem;
+    margin: 1.25rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 1.08rem;
+    line-height: 1.75;
+  }
+
+  .hero-description code,
+  .performance-section code {
+    color: var(--color-text);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.92em;
+  }
+
+  .hero-actions,
+  .quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .hero-console {
+    align-self: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-soft) 100%);
+    box-shadow: var(--shadow-surface);
+    padding: 1.2rem;
+  }
+
+  .console-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.9rem;
+    color: var(--color-text-muted);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  .console-header span:last-child {
+    color: var(--color-accent);
+  }
+
+  .agent-sequence {
+    position: relative;
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-page);
+    padding: 0.9rem;
+    overflow: hidden;
+  }
+
+  .agent-sequence::before {
+    content: "";
+    position: absolute;
+    inset: 3.15rem 0.9rem 1rem;
+    background-image: linear-gradient(to right, var(--color-border) 1px, transparent 1px);
+    background-size: 33.333% 100%;
+    opacity: 0.75;
+    pointer-events: none;
+  }
+
+  .participants {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .participants span {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-accent);
+    padding: 0.45rem 0.3rem;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.65rem;
+    font-weight: 650;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .sequence-row {
+    --from: 0;
+    --to: 1;
+    position: relative;
+    z-index: 1;
+    min-height: 2.15rem;
+  }
+
+  .sequence-row::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: calc((100% - 0.45rem) * var(--from) / 3 + 0.225rem);
+    width: calc((100% - 0.45rem) * (var(--to) - var(--from)) / 3);
+    border-top: 1px solid var(--color-border-strong);
+  }
+
+  .sequence-row::after {
+    content: "";
+    position: absolute;
+    top: calc(50% - 0.24rem);
+    left: calc((100% - 0.45rem) * var(--to) / 3 - 0.25rem);
+    width: 0.48rem;
+    height: 0.48rem;
+    border-right: 1px solid var(--color-border-strong);
+    border-bottom: 1px solid var(--color-border-strong);
+    transform: rotate(-45deg);
+  }
+
+  .sequence-row span {
+    position: absolute;
+    top: 0;
+    left: calc((100% - 0.45rem) * var(--from) / 3 + 0.6rem);
+    max-width: 58%;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    padding: 0.35rem 0.5rem;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.68rem;
+    font-weight: 650;
+    line-height: 1.25;
+  }
+
+  .agent-to-mcp { --from: 0; --to: 1; }
+  .mcp-to-db { --from: 1; --to: 2; }
+  .db-to-agent { --from: 0; --to: 2; }
+  .agent-to-db { --from: 0; --to: 2; }
+  .agent-to-kube { --from: 0; --to: 3; }
+
+  .db-to-agent::after {
+    left: calc((100% - 0.45rem) * var(--from) / 3 + 0.02rem);
+    transform: rotate(135deg);
+  }
+
+  .db-to-agent span {
+    left: calc((100% - 0.45rem) * var(--from) / 3 + 0.6rem);
+    background: var(--color-accent-soft);
+  }
+
+  .proof-row span {
+    background: var(--color-signal-soft);
+  }
+
+  .optional-row span {
+    border-style: dashed;
+    background: var(--color-page);
+    color: var(--color-text-muted);
+  }
+
+  .metrics-band {
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .metrics-grid {
+    display: grid;
+    gap: 0;
+  }
+
+  .metrics-grid article {
+    border-bottom: 1px solid var(--color-border);
+    padding: 1.25rem 0;
+  }
+
+  .metrics-grid strong {
+    display: block;
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 1.05rem;
+  }
+
+  .metrics-grid span {
+    display: block;
+    max-width: 18rem;
+    margin-top: 0.4rem;
+    color: var(--color-text-muted);
+    font-size: 0.86rem;
+    line-height: 1.45;
+  }
+
+  .section {
+    border-top: 1px solid var(--color-border);
+    padding-block: 4rem;
+  }
+
+  .white-section {
+    background: var(--color-surface);
+  }
+
+
+  .section-label {
+    margin: 0;
+    color: var(--color-accent);
+    font-size: 0.875rem;
+    font-weight: 650;
+  }
+
+  .section h2,
+  .section-intro h2 {
+    margin: 0.75rem 0 0;
+    font-size: 1.875rem;
+    line-height: 1.2;
+    font-weight: 650;
+  }
+
+  .section-intro {
+    max-width: 54rem;
+  }
+
+  .section-intro p:last-child,
+  .quickstart p:last-child {
+    margin: 1rem 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+
+  .attraction-layout,
+  .performance-layout,
+  .quickstart {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .performance-layout > * {
+    min-width: 0;
+  }
+
+  .why-contrast {
+    display: grid;
+    gap: 0.65rem;
+    margin-top: 1.25rem;
+  }
+
+  .why-contrast div {
+    display: grid;
+    gap: 0.35rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-page);
+    padding: 0.9rem;
+  }
+
+  .why-contrast span {
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  .why-contrast strong {
+    display: block;
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .product-card-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .product-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-page);
+    padding: 1.25rem;
+  }
+
+  .product-card .icon-sm {
+    color: var(--color-accent);
+  }
+
+  .product-card h3 {
+    margin: 1rem 0 0;
+    font-size: 1.25rem;
+  }
+
+  .product-card p {
+    margin: 0.7rem 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.65;
+  }
+
+  .performance-section {
+    background: var(--color-surface-soft);
+  }
+
+  .architecture-section {
+    background: var(--color-page);
+  }
+
+  .evidence-layout {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .ledger-grid {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .ledger-grid article {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-page);
+    padding: 1rem;
+  }
+
+  .ledger-grid strong {
+    display: block;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.9rem;
+  }
+
+  .ledger-grid span {
+    display: block;
+    margin-top: 0.4rem;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .mode-table {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .mode-table article {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    padding: 1.25rem;
+  }
+
+  .mode-head {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .mode-head span {
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.75rem;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  .mode-head strong {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--color-signal);
+    font-size: 0.9rem;
+  }
+
+  .mode-table h3 {
+    margin: 0.75rem 0 0;
+    font-size: 1.25rem;
+  }
+
+  .mode-table p {
+    margin: 0.5rem 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+
+  .quickstart {
+    border-radius: var(--radius-md);
+    padding: 2rem;
+  }
+
+  @media (min-width: 720px) {
+    .why-contrast {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .metrics-grid,
+    .product-card-grid,
+    .ledger-grid,
+    .mode-table {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .metrics-grid article {
+      border-bottom: 0;
+      border-right: 1px solid var(--color-border);
+      padding: 1.35rem 1.35rem 1.35rem 0;
+    }
+
+    .metrics-grid article + article {
+      padding-left: 1.35rem;
+    }
+
+    .metrics-grid article:last-child {
+      border-right: 0;
+    }
+
+    .ledger-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 980px) {
+    .hero-layout {
+      grid-template-columns: minmax(0, 0.94fr) minmax(26rem, 0.8fr);
+      padding-block: 5rem 3.8rem;
+    }
+
+    .ki-product-hero h1 {
+      font-size: 4.25rem;
+    }
+
+    .attraction-layout {
+      grid-template-columns: minmax(18rem, 0.62fr) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .performance-layout {
+      grid-template-columns: minmax(18rem, 0.58fr) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .quickstart {
+      grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.78fr);
+      align-items: start;
+    }
+
+    .sticky-copy {
+      position: sticky;
+      top: 7rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero-layout {
+      padding-block: 3.5rem 3rem;
+    }
+
+    .ki-product-hero h1 {
+      font-size: 2.5rem;
+    }
+
+    .hero-tagline {
+      font-size: 1.3rem;
+    }
+  }
+</style>
