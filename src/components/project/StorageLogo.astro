@@ -15,10 +15,13 @@ const icons = {
     src: "/assets/logos/chdb.png",
   },
 };
-const icon = icons[normalized];
+type StorageIconName = keyof typeof icons;
+const isStorageIconName = (value: string): value is StorageIconName => value in icons;
+const iconName = isStorageIconName(normalized) ? normalized : undefined;
+const icon = iconName ? icons[iconName] : undefined;
 ---
 
-<span class:list={["storage-logo", `storage-logo-${size}`, normalized === "chdb" && "storage-logo-chdb"]} aria-hidden="true">
+<span class:list={["storage-logo", `storage-logo-${size}`, iconName === "chdb" && "storage-logo-chdb"]} aria-hidden="true">
   {icon ? <img src={icon.src} alt="" loading="lazy" decoding="async" /> : null}
 </span>
 
