@@ -36,7 +36,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: latest
+          node-version: 24
           check-latest: true
           cache: npm
 
@@ -58,4 +58,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=nowake-ai-website --branch=main
+          command: pages deploy dist --project-name=nowake-ai-website --branch=main --commit-dirty=true
