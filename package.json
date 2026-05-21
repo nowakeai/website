@@ -5,11 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
+    "predev": "npm run sync:docs",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "sync:docs": "node scripts/sync-project-docs.mjs",
+    "check:docs": "node scripts/sync-project-docs.mjs --check",
+    "prebuild": "npm run sync:docs"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.5",
+    "@astrojs/starlight": "^0.39.2",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.3.5",
     "class-variance-authority": "^0.7.1",

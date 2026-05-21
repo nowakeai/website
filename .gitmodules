@@ -1,0 +1,8 @@
+[submodule "vendor/kube-insight"]
+	path = vendor/kube-insight
+	url = ../kube-insight
+	branch = main
+[submodule "vendor/svc-lb-mux"]
+	path = vendor/svc-lb-mux
+	url = ../svc-lb-mux
+	branch = main

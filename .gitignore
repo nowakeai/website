@@ -1,3 +1,14 @@
 node_modules/
 dist/
 .astro/
+
+# Generated from project submodules by scripts/sync-project-docs.mjs
+src/content/docs/docs/kube-insight/**/*.md
+!src/content/docs/docs/kube-insight/index.md
+src/content/docs/docs/svc-lb-mux/**/*.md
+!src/content/docs/docs/svc-lb-mux/index.md
+
+# Local environment overrides
+.env
+.env.*
+!.env.example

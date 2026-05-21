@@ -32,6 +32,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          submodules: recursive
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -42,6 +44,12 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Sync project docs
+        run: npm run sync:docs
+
+      - name: Check synced docs
+        run: npm run check:docs
 
       - name: Build
         run: npm run build

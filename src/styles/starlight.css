@@ -1,0 +1,84 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+@import "./tokens.css";
+
+:root {
+  --sl-font: "Geist";
+  --sl-font-mono: "IBM Plex Mono";
+  --sl-content-width: 52rem;
+  --sl-sidebar-width: 19.5rem;
+  --sl-text-h1: 2.625rem;
+  --sl-text-h2: 1.8125rem;
+  --sl-text-h3: 1.35rem;
+  --sl-line-height: 1.72;
+  --sl-color-accent: #245aae;
+  --sl-color-accent-high: #dbe7fa;
+  --sl-color-accent-low: #1d335d;
+}
+
+:root[data-theme="light"] {
+  --sl-color-bg: var(--color-page);
+  --sl-color-bg-nav: color-mix(in srgb, var(--color-page) 94%, transparent);
+  --sl-color-bg-sidebar: var(--color-surface);
+  --sl-color-bg-inline-code: var(--color-surface-soft);
+  --sl-color-text: var(--color-text);
+  --sl-color-text-accent: var(--color-accent);
+  --sl-color-hairline: var(--color-border);
+  --sl-color-hairline-light: var(--color-border);
+  --sl-color-hairline-shade: var(--color-border-strong);
+  --sl-color-accent: var(--color-accent);
+  --sl-color-accent-high: #183f7d;
+  --sl-color-accent-low: var(--color-accent-soft);
+}
+
+:root[data-theme="dark"] {
+  --sl-color-bg: #111723;
+  --sl-color-bg-nav: #151c2a;
+  --sl-color-bg-sidebar: #121925;
+  --sl-color-bg-inline-code: #1c2637;
+  --sl-color-text-accent: #a8c6f5;
+  --sl-color-accent: #7eabed;
+  --sl-color-accent-high: #d8e8ff;
+  --sl-color-accent-low: #1f3b63;
+}
+
+html {
+  letter-spacing: 0;
+}
+
+.site-title {
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.header {
+  border-bottom: 1px solid var(--sl-color-hairline);
+  backdrop-filter: blur(14px);
+}
+
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3 {
+  letter-spacing: 0;
+}
+
+.sl-markdown-content a:not(:where(.not-content *)) {
+  font-weight: 650;
+}
+
+.sl-markdown-content code:not(:where(pre *)) {
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 0.375rem;
+  padding: 0.08rem 0.28rem;
+}
+
+.sidebar-content a[aria-current="page"],
+.sidebar-content a:hover {
+  border-radius: 0.375rem;
+}
+
+@media (max-width: 50rem) {
+  :root {
+    --sl-text-h1: 2.1875rem;
+    --sl-text-h2: 1.5rem;
+  }
+}

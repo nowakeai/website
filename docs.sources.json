@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "defaults": {
+    "audience": "platform-engineer",
+    "status": "preview",
+    "last_verified": "2026-05-20",
+    "source_branch": "main"
+  },
+  "projects": [
+    {
+      "project": "svc-lb-mux",
+      "source_repo": "nowakeai/svc-lb-mux",
+      "localPath": "vendor/svc-lb-mux",
+      "targetRoot": "src/content/docs/docs/svc-lb-mux",
+      "pages": [
+        {
+          "source": "docs/getting-started.md",
+          "target": "getting-started.md",
+          "title": "Getting Started",
+          "description": "Install svc-lb-mux, create a mux Service, expose a first channel, and validate the result.",
+          "category": "guide"
+        },
+        {
+          "source": "docs/channel-services.md",
+          "target": "concepts/mux-and-channel-services.md",
+          "title": "Mux And Channel Services",
+          "description": "Understand mux Services, channel Services, public ports, target ports, and automatic allocation.",
+          "category": "concept"
+        },
+        {
+          "source": "docs/tutorials.md",
+          "target": "guides/tutorials.md",
+          "title": "Tutorials",
+          "description": "Copyable svc-lb-mux examples for common HTTP, TCP, migration, allocation, and GitOps cases.",
+          "category": "guide"
+        },
+        {
+          "source": "docs/gke-lb-setup.md",
+          "target": "providers/gke.md",
+          "title": "GKE",
+          "description": "GKE-specific svc-lb-mux setup, validation, static IP, firewall, and capacity notes.",
+          "category": "provider",
+          "applies_to": [
+            "GKE"
+          ]
+        },
+        {
+          "source": "docs/aws-nlb-setup.md",
+          "target": "providers/aws-nlb.md",
+          "title": "AWS NLB",
+          "description": "AWS Network Load Balancer setup notes and values examples for svc-lb-mux on EKS.",
+          "category": "provider",
+          "applies_to": [
+            "EKS",
+            "AWS NLB"
+          ]
+        },
+        {
+          "source": "docs/gitops.md",
+          "target": "operations/gitops.md",
+          "title": "GitOps",
+          "description": "Argo CD and Flux guidance for svc-lb-mux runtime fields and provider-managed drift.",
+          "category": "operations"
+        },
+        {
+          "source": "docs/troubleshooting.md",
+          "target": "operations/troubleshooting.md",
+          "title": "Troubleshooting",
+          "description": "Diagnose missing mux ports, pending ingress, failed backends, GitOps drift, and port conflicts.",
+          "category": "troubleshooting"
+        },
+        {
+          "source": "docs/gke-pressure-test-report.md",
+          "target": "operations/pressure-testing.md",
+          "title": "Pressure Testing",
+          "description": "Sanitized GKE pressure-test report for svc-lb-mux channel and backend validation.",
+          "category": "operations",
+          "applies_to": [
+            "GKE"
+          ]
+        },
+        {
+          "source": "docs/controller.md",
+          "target": "architecture/controller-design.md",
+          "title": "Controller Design",
+          "description": "Controller behavior, ownership, generated endpoints, events, and current limitations.",
+          "category": "architecture"
+        },
+        {
+          "source": "ROADMAP.md",
+          "target": "roadmap.md",
+          "title": "Roadmap",
+          "description": "Current svc-lb-mux limits, release direction, and follow-up work.",
+          "category": "roadmap",
+          "status": "roadmap"
+        }
+      ],
+      "nav_order": 20
+    },
+    {
+      "project": "kube-insight",
+      "source_repo": "nowakeai/kube-insight",
+      "localPath": "vendor/kube-insight",
+      "targetRoot": "src/content/docs/docs/kube-insight",
+      "pages": [
+        {
+          "source": "docs/quickstart.md",
+          "target": "getting-started.md",
+          "title": "Getting Started",
+          "description": "Install kube-insight and start collecting retained Kubernetes evidence in a local environment.",
+          "category": "guide"
+        },
+        {
+          "source": "docs/requirements/product-brief.md",
+          "target": "concepts/retained-evidence.md",
+          "title": "Retained Evidence",
+          "description": "Why kube-insight preserves Kubernetes history and how retained evidence supports investigations.",
+          "category": "concept"
+        },
+        {
+          "source": "docs/data/data-model.md",
+          "target": "concepts/data-model.md",
+          "title": "Data Model",
+          "description": "User-facing overview of kube-insight versions, facts, edges, observations, and queryable state.",
+          "category": "concept"
+        },
+        {
+          "source": "docs/workflows/agent-sql-cookbook.md",
+          "target": "guides/agent-sql-workflows.md",
+          "title": "Agent SQL Workflows",
+          "description": "Concrete SQL workflows for agents and operators investigating retained Kubernetes evidence.",
+          "category": "guide",
+          "agent_friendly": true
+        },
+        {
+          "source": "docs/validation/storage-mode-comparison.md",
+          "target": "operations/performance-validation.md",
+          "title": "Performance Validation",
+          "description": "Measured kube-insight storage and query behavior with explicit scope and freshness caveats.",
+          "category": "operations"
+        },
+        {
+          "source": "docs/security/security-retention.md",
+          "target": "security/sanitization-and-retention.md",
+          "title": "Sanitization And Retention",
+          "description": "Sensitive-data handling, sanitization behavior, retention boundaries, and security notes.",
+          "category": "security"
+        },
+        {
+          "source": "docs/architecture/system-architecture.md",
+          "target": "architecture/system-architecture.md",
+          "title": "System Architecture",
+          "description": "kube-insight system architecture, control flow, storage, and query surfaces.",
+          "category": "architecture"
+        },
+        {
+          "source": "docs/ingestion/ingestion-and-extraction.md",
+          "target": "architecture/ingestion-and-extraction.md",
+          "title": "Ingestion And Extraction",
+          "description": "How kube-insight watches Kubernetes resources and extracts facts, edges, and observations.",
+          "category": "architecture"
+        }
+      ],
+      "nav_order": 10
+    }
+  ]
+}
