@@ -2,30 +2,24 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Icon from "../components/Icons.astro";
 
-const noiseRows = [
+const productSignals = [
   {
-    title: "Alerts and notification noise",
-    text: "Triage should preserve context and lift meaningful cases.",
-    icon: "bell-ring",
+    title: "Retained Kubernetes evidence",
+    text: "Store sanitized versions, facts, edges, and observations.",
+    icon: "archive",
     tone: "accent",
   },
   {
-    title: "Manual maintenance",
-    text: "Repeated work should become bounded, reviewable automation.",
-    icon: "wrench",
+    title: "Human and agent query surfaces",
+    text: "Use read-only SQL, API, and MCP before live checks.",
+    icon: "database-zap",
     tone: "signal",
   },
   {
-    title: "Access, safety, and audit",
-    text: "Production changes need least privilege and accountable records.",
+    title: "Sanitized by design",
+    text: "Filter sensitive fields before evidence is stored.",
     icon: "shield-check",
     tone: "warn",
-  },
-  {
-    title: "Recovery and capacity work",
-    text: "Known procedures should be easier to verify and repeat.",
-    icon: "activity",
-    tone: "accent",
   },
 ] as const;
 
@@ -71,42 +65,57 @@ const principles = [
     <div class="page-shell hero-grid">
       <div class="hero-copy">
         <p class="eyebrow">Open-source cloud-native operations</p>
-        <h1>Less operational noise. More important work.</h1>
+        <h1>Help engineers focus on what matters.</h1>
         <p class="hero-subtitle">
           nowake.ai builds open-source, AI-assisted tools that make infrastructure work easier to inspect, automate, and prioritize.
         </p>
         <div class="hero-actions">
-          <a class="button button-primary" href="#build">
-            <Icon name="arrow-down" class="icon-sm" />
-            What we build
-          </a>
-          <a class="button button-secondary" href="/projects/kube-insight">
-            <Icon name="box" class="icon-sm" />
+          <a class="button button-primary spotlight-button" href="/projects/kube-insight">
+            <Icon name="database-zap" class="icon-sm" />
             Explore kube-insight
+          </a>
+          <a class="button button-secondary" href="/docs/kube-insight/">
+            <Icon name="book-open" class="icon-sm" />
+            Read docs
           </a>
         </div>
       </div>
 
-      <div class="hero-panel-wrap">
-        <div class="surface hero-panel">
-          <div class="panel-header">
-            <span>operational-noise.index</span>
-            <span class="badge accent-badge">inspectable</span>
+      <div class="hero-product-wrap">
+        <article class="surface hero-product" aria-label="kube-insight product introduction">
+          <div class="product-kicker">
+            <span>flagship product</span>
+            <span class="badge accent-badge">kubernetes aiops</span>
           </div>
-          <div class="noise-list">
+          <h2>kube-insight</h2>
+          <p class="product-tagline">The missing history layer for Kubernetes AIOps.</p>
+          <p class="product-copy">
+            Preserve sanitized Kubernetes history so humans and agents can investigate from retained proof before checking live state.
+          </p>
+          <div class="product-signal-list">
             {
-              noiseRows.map((item) => (
-                <div class="noise-row">
+              productSignals.map((item) => (
+                <div class="product-signal">
+                  <Icon name={item.icon} class={["icon", item.tone].join(" ")} />
                   <div>
-                    <p>{item.title}</p>
+                    <strong>{item.title}</strong>
                     <span>{item.text}</span>
                   </div>
-                  <Icon name={item.icon} class={`icon ${item.tone}`} />
                 </div>
               ))
             }
           </div>
-        </div>
+          <div class="product-actions">
+            <a class="button button-primary" href="/projects/kube-insight">
+              <Icon name="arrow-up-right" class="icon-sm" />
+              Open product page
+            </a>
+            <a class="text-link" href="/docs/kube-insight/getting-started/">
+              Quickstart
+              <Icon name="arrow-up-right" class="icon-sm" />
+            </a>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -124,7 +133,7 @@ const principles = [
         {
           buildItems.map((item) => (
             <article class="surface feature-card">
-              <Icon name={item.icon} class={`icon ${item.tone}`} />
+              <Icon name={item.icon} class={["icon", item.tone].join(" ")} />
               <h3>{item.title}</h3>
               <p>{item.text}</p>
             </article>
@@ -148,7 +157,7 @@ const principles = [
       </div>
 
       <div class="project-grid">
-        <article class="surface project-card">
+        <article class="surface project-card project-card-featured">
           <div class="project-meta">
             <p>Active / flagship</p>
             <span class="badge accent-badge">kubernetes</span>
@@ -159,6 +168,7 @@ const principles = [
           </p>
           <div class="card-actions">
             <a class="button button-primary" href="/projects/kube-insight">Project page</a>
+            <a class="button button-secondary" href="/docs/kube-insight/">Docs</a>
             <a class="button button-secondary" href="https://github.com/nowakeai/kube-insight">GitHub</a>
           </div>
         </article>
@@ -175,6 +185,7 @@ const principles = [
           </p>
           <div class="card-actions">
             <a class="button button-primary" href="/projects/svc-lb-mux">Project page</a>
+            <a class="button button-secondary" href="/docs/svc-lb-mux/">Docs</a>
             <a class="button button-secondary" href="https://github.com/nowakeai/svc-lb-mux">GitHub</a>
           </div>
         </article>
@@ -200,10 +211,10 @@ const principles = [
   }
 
   .hero-grid {
-    min-height: calc(100vh - 73px);
+    min-height: calc(100vh - 145px);
     display: grid;
     gap: 2.5rem;
-    padding-block: 3.5rem;
+    padding-block: 3rem;
   }
 
   .hero-copy {
@@ -213,16 +224,16 @@ const principles = [
   }
 
   .hero h1 {
-    max-width: 64rem;
+    max-width: 52rem;
     margin: 1.25rem 0 0;
     font-size: 2.25rem;
-    line-height: 1.05;
+    line-height: 1.08;
     font-weight: 650;
     letter-spacing: 0;
   }
 
   .hero-subtitle {
-    max-width: 48rem;
+    max-width: 47rem;
     margin: 1.5rem 0 0;
     color: var(--color-text-muted);
     font-size: 1.125rem;
@@ -237,58 +248,98 @@ const principles = [
     margin-top: 2rem;
   }
 
-  .hero-panel-wrap {
+  .spotlight-button {
+    min-height: 48px;
+    padding-inline: 1.15rem;
+    box-shadow: 0 14px 34px rgba(23, 31, 48, 0.18);
+  }
+
+  .hero-product-wrap {
     display: flex;
     align-items: center;
   }
 
-  .hero-panel {
+  .hero-product {
     width: 100%;
     border-radius: var(--radius-md);
-    padding: 1.25rem;
+    padding: 1.1rem;
   }
 
-  .panel-header {
+  .product-kicker,
+  .project-meta {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: 1rem;
-    color: var(--color-text-muted);
+  }
+
+  .product-kicker span:first-child,
+  .project-meta p {
+    margin: 0;
+    color: var(--color-accent);
     font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-size: 0.75rem;
     font-weight: 650;
     text-transform: uppercase;
   }
 
-  .noise-list {
-    margin-top: 1.25rem;
-  }
-
-  .noise-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 1rem;
-    align-items: center;
-    border-bottom: 1px solid var(--color-border);
-    padding: 0.875rem 0;
-  }
-
-  .noise-row:last-child {
-    border-bottom: 0;
-  }
-
-  .noise-row p {
-    margin: 0;
+  .hero-product h2 {
+    margin: 1.15rem 0 0;
+    font-size: clamp(2.4rem, 5vw, 4.35rem);
+    line-height: 0.95;
     font-weight: 650;
   }
 
-  .noise-row span {
-    display: block;
-    margin-top: 0.25rem;
+  .product-tagline {
+    margin: 0.8rem 0 0;
+    color: var(--color-accent);
+    font-size: clamp(1.2rem, 2vw, 1.55rem);
+    line-height: 1.15;
+    font-weight: 650;
+  }
+
+  .product-copy {
+    margin: 0.85rem 0 0;
     color: var(--color-text-muted);
-    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  .product-signal-list {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: 1rem;
+  }
+
+  .product-signal {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: start;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-page);
+    padding: 0.7rem;
+  }
+
+  .product-signal strong {
+    display: block;
+    font-size: 0.9rem;
+  }
+
+  .product-signal span {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    line-height: 1.35;
+  }
+
+  .product-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.85rem;
+    margin-top: 1rem;
   }
 
   .section {
@@ -337,11 +388,6 @@ const principles = [
   .principle-grid {
     display: grid;
     gap: 1rem;
-  }
-
-  .four-grid,
-  .project-grid,
-  .principle-grid {
     margin-top: 2rem;
   }
 
@@ -349,6 +395,11 @@ const principles = [
   .project-card {
     border-radius: var(--radius-md);
     padding: 1.25rem;
+  }
+
+  .project-card-featured {
+    border-color: rgba(36, 90, 174, 0.28);
+    box-shadow: 0 20px 52px rgba(36, 90, 174, 0.12);
   }
 
   .feature-card h3,
@@ -405,22 +456,6 @@ const principles = [
     color: var(--color-signal);
   }
 
-  .project-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-
-  .project-meta p {
-    margin: 0;
-    color: var(--color-accent);
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.75rem;
-    font-weight: 650;
-    text-transform: uppercase;
-  }
-
   .principles-section .principle-grid {
     margin-top: 0;
   }
@@ -432,6 +467,31 @@ const principles = [
     padding: 1rem;
     font-size: 0.875rem;
     font-weight: 650;
+  }
+
+  @media (max-width: 639px) {
+    .hero-grid {
+      gap: 1.5rem;
+      padding-block: 2rem;
+    }
+
+    .hero-subtitle {
+      margin-top: 1rem;
+      line-height: 1.55;
+    }
+
+    .hero-actions {
+      margin-top: 1.4rem;
+    }
+
+    .hero-product h2 {
+      margin-top: 0.9rem;
+    }
+
+    .product-copy,
+    .product-signal-list {
+      display: none;
+    }
   }
 
   @media (min-width: 640px) {
@@ -458,12 +518,12 @@ const principles = [
 
   @media (min-width: 1024px) {
     .hero-grid {
-      grid-template-columns: 1.06fr 0.94fr;
-      padding-block: 5rem;
+      grid-template-columns: minmax(0, 0.92fr) minmax(28rem, 0.92fr);
+      padding-block: 3.5rem;
     }
 
     .hero h1 {
-      font-size: 3.75rem;
+      font-size: 3.65rem;
     }
 
     .split-section {

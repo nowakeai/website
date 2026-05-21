@@ -50,6 +50,8 @@ const roadmapItems = [
 <BaseLayout
   title="svc-lb-mux | nowake.ai"
   description="Service LoadBalancer Multiplexer lets many Kubernetes LoadBalancer Services share one provider-managed Layer 4 load balancer."
+  githubHref="https://github.com/nowakeai/svc-lb-mux"
+  githubLabel="svc-lb-mux"
 >
   <section class="mux-hero grid-paper">
     <div class="page-shell mux-hero-grid">
@@ -73,7 +75,7 @@ const roadmapItems = [
             <Icon name="github" class="icon-sm" />
             GitHub
           </a>
-          <a class="button button-secondary" href="https://github.com/nowakeai/svc-lb-mux/tree/main/docs">
+          <a class="button button-secondary" href="/docs/svc-lb-mux/">
             <Icon name="book-open" class="icon-sm" />
             Docs
           </a>
@@ -110,6 +112,53 @@ const roadmapItems = [
           </section>
         </div>
       </aside>
+    </div>
+  </section>
+
+
+  <section class="section quickstart-section">
+    <div class="page-shell quickstart-layout">
+      <div class="section-intro">
+        <p class="section-label">Quickstart</p>
+        <h2>Install one mux, expose one channel, verify the mapping.</h2>
+        <p>
+          Start with the default Helm install and a small echo Service. Provider-specific production values can come
+          after the controller, mux Service, and first channel are visible.
+        </p>
+        <div class="quick-links">
+          <a class="button button-primary" href="/docs/svc-lb-mux/getting-started/">
+            <Icon name="book-open" class="icon-sm" />
+            Full quickstart
+          </a>
+          <a class="button button-secondary" href="/docs/svc-lb-mux/providers/gke/">
+            <Icon name="workflow" class="icon-sm" />
+            GKE guide
+          </a>
+        </div>
+      </div>
+      <div class="quickstart-steps">
+        <article>
+          <span>01</span>
+          <h3>Install the controller</h3>
+          <pre><code>helm install svc-mux oci://ghcr.io/nowakeai/charts/svc-lb-mux \
+  --version 0.1.1 \
+  --namespace svc-mux \
+  --create-namespace</code></pre>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Watch the mux Service</h3>
+          <pre><code>kubectl get deploy -n svc-mux
+kubectl get svc mux -n svc-mux -w</code></pre>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Expose a channel Service</h3>
+          <pre><code>kubectl apply -f echo-channel.yaml
+kubectl get svc echo -n default
+kubectl get endpoints mux -n svc-mux</code></pre>
+        </article>
+      </div>
     </div>
   </section>
 
@@ -213,10 +262,9 @@ const roadmapItems = [
       <div class="soft-panel quickstart">
         <div>
           <p class="section-label">Next steps</p>
-          <h2>Start with the provider guide and one mux.</h2>
+          <h2>Use the docs site for provider guides and operating notes.</h2>
           <p>
-            The repository includes Helm install docs, channel Service examples, GKE and AWS setup guides, GitOps notes,
-            troubleshooting, and controller design details.
+            The docs site renders Helm install docs, channel Service examples, GKE and AWS setup guides, GitOps notes, troubleshooting, and controller design details from the project repository.
           </p>
         </div>
         <div class="quick-actions">
@@ -224,11 +272,11 @@ const roadmapItems = [
             <Icon name="github" class="icon-sm" />
             Open GitHub
           </a>
-          <a class="button button-secondary" href="https://github.com/nowakeai/svc-lb-mux/tree/main/docs/gke-lb-setup.md">
+          <a class="button button-secondary" href="/docs/svc-lb-mux/providers/gke/">
             <Icon name="book-open" class="icon-sm" />
             GKE guide
           </a>
-          <a class="button button-secondary" href="https://github.com/nowakeai/svc-lb-mux/blob/main/docs/channel-services.md">
+          <a class="button button-secondary" href="/docs/svc-lb-mux/concepts/mux-and-channel-services/">
             <Icon name="workflow" class="icon-sm" />
             Channel manual
           </a>
@@ -268,11 +316,21 @@ const roadmapItems = [
   .compare-grid p { margin: 0.85rem 0 0; color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.55; }
 
   .section { border-top: 1px solid var(--color-border); padding-block: 4rem; }
+  .quickstart-section { background: var(--color-surface); }
+  .quickstart-layout { display: grid; gap: 2rem; }
+  .quickstart-layout > *, .quickstart-steps, .quickstart-steps article, .quickstart-steps pre { min-width: 0; }
+  .quick-links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+  .quickstart-steps { display: grid; gap: 1rem; }
+  .quickstart-steps article { border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-page); padding: 1rem; }
+  .quickstart-steps span { color: var(--color-accent); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.75rem; font-weight: 650; }
+  .quickstart-steps h3 { margin: 0.45rem 0 0; font-size: 1rem; }
+  .quickstart-steps pre { margin: 0.9rem 0 0; overflow-x: auto; border-radius: var(--radius-sm); background: #0f172a; color: #e5edf8; padding: 1rem; font-size: 0.78rem; line-height: 1.55; }
+  .quickstart-steps code { font-family: "IBM Plex Mono", ui-monospace, monospace; }
   .white-section { background: var(--color-surface); }
   .section-label { margin: 0; color: var(--color-accent); font-size: 0.875rem; font-weight: 650; }
   .section h2 { margin: 0.75rem 0 0; font-size: clamp(1.8rem, 3vw, 2.65rem); line-height: 1.1; font-weight: 650; }
   .section-intro p:last-child, .mechanics-layout > div > p, .roadmap-layout > div > p, .quickstart p:last-child { margin: 1rem 0 0; color: var(--color-text-muted); line-height: 1.75; }
-  .scenario-layout, .mechanics-layout, .operating-layout, .provider-layout, .roadmap-layout, .quickstart { display: grid; gap: 2rem; }
+  .quickstart-layout, .scenario-layout, .mechanics-layout, .operating-layout, .provider-layout, .roadmap-layout, .quickstart { display: grid; gap: 2rem; }
   .scenario-cards, .operating-table, .provider-grid, .roadmap-list { display: grid; gap: 0.85rem; }
   .scenario-card { border-radius: var(--radius-md); padding: 1.4rem; }
   .scenario-card span { color: var(--color-accent); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.75rem; font-weight: 650; text-transform: uppercase; }
@@ -316,6 +374,7 @@ const roadmapItems = [
 
   @media (min-width: 980px) {
     .mux-hero-grid { grid-template-columns: minmax(0, 0.95fr) minmax(28rem, 0.85fr); padding-block: 5rem; }
+    .quickstart-layout { grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr); align-items: start; }
     .scenario-layout, .mechanics-layout, .operating-layout, .roadmap-layout { grid-template-columns: minmax(0, 0.72fr) minmax(28rem, 1fr); align-items: start; }
     .provider-layout { grid-template-columns: minmax(0, 0.8fr) minmax(26rem, 1.1fr); align-items: start; }
     .provider-layout .provider-grid { grid-column: 2; grid-row: 1; grid-template-columns: 1fr; }

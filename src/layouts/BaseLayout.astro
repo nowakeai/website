@@ -6,11 +6,15 @@ import Footer from "../components/Footer.astro";
 interface Props {
   title?: string;
   description?: string;
+  githubHref?: string;
+  githubLabel?: string;
 }
 
 const {
   title = "nowake.ai",
   description = "Open-source tools for reducing operational noise across Kubernetes and cloud-native infrastructure.",
+  githubHref = "https://github.com/nowakeai",
+  githubLabel = "GitHub",
 } = Astro.props;
 ---
 
@@ -25,7 +29,7 @@ const {
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
-    <Header />
+    <Header githubHref={githubHref} githubLabel={githubLabel} />
     <main id="main-content">
       <slot />
     </main>

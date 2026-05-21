@@ -1,6 +1,13 @@
 ---
 import Icon from "./Icons.astro";
 
+interface Props {
+  githubHref?: string;
+  githubLabel?: string;
+}
+
+const { githubHref = "https://github.com/nowakeai", githubLabel = "GitHub" } = Astro.props;
+
 const projectItems = [
   {
     label: "kube-insight",
@@ -77,9 +84,9 @@ const navItems = [
       {navItems.map((item) => <a class="min-h-11 inline-flex items-center font-medium text-[var(--color-text)] transition-colors hover:text-[var(--color-accent)]" href={item.href}>{item.label}</a>)}
     </div>
 
-    <a class="button button-secondary hidden md:inline-flex" href="https://github.com/nowakeai">
+    <a class="button button-secondary hidden md:inline-flex" href={githubHref}>
       <Icon name="github" class="icon-sm" />
-      GitHub
+      {githubLabel}
     </a>
   </nav>
 
