@@ -5,7 +5,7 @@ project: nowake-ai
 category: overview
 audience: platform-engineer
 status: preview
-last_verified: 2026-05-20
+last_verified: 2026-05-28
 source_repo: nowakeai/website
 source_path: DOCS_SITE_PLAN.md
 sidebar:
@@ -16,9 +16,9 @@ This documentation site collects public, task-oriented documentation for nowake.
 
 ## Projects
 
-[kube-insight](/docs/kube-insight/) is an AIOps infrastructure component for retained Kubernetes evidence: sanitized history, facts, edges, observations, and query surfaces for humans and agents.
+[kube-insight](/docs/kube-insight/) is an AIOps infrastructure component for retained Kubernetes evidence: sanitized history, facts, edges, observations, an embedded Web UI, and query surfaces for humans and agents.
 
-[svc-lb-mux](/docs/svc-lb-mux/) is an operations-first Kubernetes controller that lets multiple application-facing `LoadBalancer` Services share one provider-managed Layer 4 load balancer.
+[svc-lb-mux](/docs/svc-lb-mux/) is an operations-first Kubernetes controller that lets multiple application-facing `LoadBalancer` Services share one provider-managed Layer 4 load balancer, including channel-driven external-dns aggregation.
 
 ## Getting Started
 

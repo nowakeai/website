@@ -3,7 +3,7 @@
   "defaults": {
     "audience": "platform-engineer",
     "status": "preview",
-    "last_verified": "2026-05-20",
+    "last_verified": "2026-05-28",
     "source_branch": "main"
   },
   "projects": [

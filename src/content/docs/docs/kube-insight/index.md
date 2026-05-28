@@ -5,7 +5,7 @@ project: kube-insight
 category: overview
 audience: platform-engineer
 status: preview
-last_verified: 2026-05-20
+last_verified: 2026-05-28
 source_repo: nowakeai/kube-insight
 source_path: docs/README.md
 agent_friendly: true
@@ -15,12 +15,13 @@ sidebar:
 
 `kube-insight` preserves useful Kubernetes infrastructure history so operators and agents can investigate what changed, what existed before, and how resources relate over time.
 
-Use this section for retained evidence concepts, the data model, ingestion and extraction behavior, storage modes, performance validation, sanitization, and agent SQL workflows.
+Use this section for retained evidence concepts, the data model, ingestion and extraction behavior, storage modes, performance validation, sanitization, the embedded Web UI, MCP/API service mode, and agent SQL workflows.
 
 ## Current Public Entry Points
 
 - [Getting Started](/docs/kube-insight/getting-started/)
 - [Agent SQL Workflows](/docs/kube-insight/guides/agent-sql-workflows/)
+- [System Architecture](/docs/kube-insight/architecture/system-architecture/)
 - [Performance Validation](/docs/kube-insight/operations/performance-validation/)
 - [Project page](/projects/kube-insight/)
 - [GitHub repository](https://github.com/nowakeai/kube-insight)

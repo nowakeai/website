@@ -5,7 +5,7 @@ project: svc-lb-mux
 category: overview
 audience: platform-engineer
 status: preview
-last_verified: 2026-05-20
+last_verified: 2026-05-28
 source_repo: nowakeai/svc-lb-mux
 source_path: docs/README.md
 sidebar:
@@ -14,12 +14,13 @@ sidebar:
 
 `svc-lb-mux` lets many application-facing `LoadBalancer` Services share one provider-managed Layer 4 load balancer while preserving Kubernetes-native service ownership.
 
-Use this section for install and validation commands, mux and channel service concepts, provider-specific notes, GitOps guidance, troubleshooting, and pressure-test scope.
+Use this section for install and validation commands, mux and channel service concepts, external-dns aggregation, provider-specific notes, GitOps guidance, troubleshooting, and pressure-test scope.
 
 ## Current Public Entry Points
 
 - [Getting Started](/docs/svc-lb-mux/getting-started/)
 - [Mux And Channel Services](/docs/svc-lb-mux/concepts/mux-and-channel-services/)
+- [Tutorials](/docs/svc-lb-mux/guides/tutorials/)
 - [GKE Provider Notes](/docs/svc-lb-mux/providers/gke/)
 - [Project page](/projects/svc-lb-mux/)
 - [GitHub repository](https://github.com/nowakeai/svc-lb-mux)
