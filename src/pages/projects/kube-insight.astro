@@ -35,17 +35,18 @@ const installCommand = [
 ].join("\n");
 
 const serviceCommand = [
-  "./kube-insight serve --watch --api --mcp \\",
+  "./kube-insight serve --watch --app \\",
   "  --db kubeinsight.db \\",
-  "  --api-listen 127.0.0.1:8080 \\",
-  "  --mcp-listen 127.0.0.1:8090"
+  "  --listen 127.0.0.1:8090"
 ].join("\n");
 
 const apiSmokeCommand = [
-  "curl http://127.0.0.1:8080/healthz",
-  "curl http://127.0.0.1:8080/api/v1/schema",
-  "curl 'http://127.0.0.1:8080/api/v1/health?errorsOnly=true&limit=20'"
+  "curl http://127.0.0.1:8090/healthz",
+  "curl http://127.0.0.1:8090/api/v1/schema",
+  "curl 'http://127.0.0.1:8090/api/v1/health?errorsOnly=true&problemLimit=20'"
 ].join("\n");
+
+const demoVideoUrl = "https://github.com/user-attachments/assets/abc0dd70-9237-4fd8-b17e-235336bee1f0";
 
 const mcpAgentConfig = [
   "{",
@@ -57,9 +58,6 @@ const mcpAgentConfig = [
   "  }",
   "}",
   "",
-  "# Enable the repository skill for the agent:",
-  "docs/agent/kube-insight-skill/SKILL.md",
-  "",
   "# First investigation loop:",
   "kube_insight_schema -> kube_insight_health -> kube_insight_sql -> kube_insight_history"
 ].join("\n");
@@ -68,6 +66,15 @@ const productCards = [
   { icon: "archive", title: "Keep the state that disappeared", text: "Events expire, Pods restart, EndpointSlices change, and deleted objects vanish from the apiserver. kube-insight keeps observed versions and timestamps so the old state can still be inspected." },
   { icon: "workflow", title: "Turn raw history into queryable clues", text: "Extracted facts, changes, and topology edges let operators and agents rank candidate Services, Pods, Events, owners, RBAC, webhooks, and policies before opening full JSON proof." },
   { icon: "shield-check", title: "Reduce the agent blast radius", text: "Configurable filters and extractors redact sensitive data before storage. Future service mode will inherit Kubernetes RBAC so agents see only what they are allowed to inspect." },
+] as const;
+
+const docsHighlights = [
+  { label: "Run the embedded agent", title: "Built-in Web UI Agent", text: "Configure server-side LLM credentials, start serve --app, and investigate retained proof in the browser.", href: "/docs/kube-insight/guides/builtin-webui-agent/" },
+  { label: "Bring your own agent", title: "External Agent Skill", text: "Connect Codex, Claude, or another MCP-capable runtime to kube-insight as a retained-evidence service.", href: "/docs/kube-insight/guides/external-agent-skill/" },
+  { label: "Operational cases", title: "Real-World Cases", text: "Webhook, Event, Service, EndpointSlice, RBAC, cert-manager, Flux, and Node-capacity investigations grounded in retained evidence.", href: "/docs/kube-insight/guides/real-world-cases/" },
+  { label: "Operate it", title: "Configuration And Processing", text: "Validate config, inspect effective defaults, tune resource profiles, and understand filters, extractors, and retention behavior.", href: "/docs/kube-insight/operations/configuration/" },
+  { label: "Evidence vocabulary", title: "Facts Catalog", text: "Use extracted fact families as fast candidate paths before opening retained JSON versions as proof.", href: "/docs/kube-insight/concepts/facts-catalog/" },
+  { label: "Security roadmap", title: "RBAC-Aware Evidence", text: "Track the design for Kubernetes RBAC inheritance and authorization-aware SQL over derived evidence.", href: "/docs/kube-insight/security/kubernetes-rbac-inheritance/" },
 ] as const;
 ---
 
@@ -99,6 +106,10 @@ const productCards = [
           <a class="button button-secondary" href="/docs/kube-insight/">
             <Icon name="book-open" class="icon-sm" />
             Docs
+          </a>
+          <a class="button button-secondary" href="#agent-demo">
+            <Icon name="activity" class="icon-sm" />
+            Watch demo
           </a>
         </div>
       </div>
@@ -146,15 +157,41 @@ const productCards = [
   </section>
 
 
+  <section id="agent-demo" class="section demo-section">
+    <div class="page-shell demo-layout">
+      <div class="section-intro">
+        <p class="section-label">Built-in agent demo</p>
+        <h2>Ask about a node-pool change and get retained proof back.</h2>
+        <p>
+          The demo asks the embedded kube-insight agent whether a managed Kubernetes node pool changed recently. The answer uses retained Node lifecycle history, SQL aggregation, current node capacity, and citations instead of broad live cluster browsing.
+        </p>
+      </div>
+      <div class="demo-player" aria-label="kube-insight built-in agent demo video">
+        <video class="demo-video" controls preload="metadata" playsinline>
+          <source src={demoVideoUrl} type="video/mp4" />
+          <a href={demoVideoUrl}>Open the kube-insight built-in agent demo video</a>
+        </video>
+        <div class="demo-video-caption">
+          <span>Built-in Web UI agent answering from retained Node history, SQL aggregation, and citations.</span>
+          <a href={demoVideoUrl}>
+            <Icon name="arrow-up-right" class="icon-sm" />
+            Open original
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
   <section class="section quickstart-section">
     <div class="page-shell quickstart-layout">
       <div class="section-intro quickstart-intro">
         <p class="section-label">Quickstart</p>
-        <h2>Run the collector, API, and MCP surface in one local loop.</h2>
+        <h2>Run the collector, Web UI, API, and MCP surface in one local loop.</h2>
         <p>
           Start with the SQLite-backed service mode. It discovers every list/watch-capable Kubernetes resource allowed by
-          the current kubeconfig, keeps sanitized evidence locally, exposes read-only API checks, and gives agents an MCP
-          surface plus a skill-guided investigation loop.
+          the current kubeconfig, keeps sanitized evidence locally, exposes read-only API checks, and gives agents the
+          embedded Web UI plus a Streamable HTTP MCP surface.
         </p>
         <div class="quick-links">
           <a class="button button-primary" href="/docs/kube-insight/getting-started/">
@@ -177,7 +214,7 @@ const productCards = [
         <article>
           <span>02</span>
           <h3>Start service mode</h3>
-          <p>Run collection, storage, HTTP API, and the Streamable HTTP MCP service together. Leaving resources unspecified uses discovery for the resources the collector can list/watch.</p>
+          <p>Run collection, storage, the embedded Web UI, HTTP API, and the Streamable HTTP MCP service together. Leaving resources unspecified uses discovery for the resources the collector can list/watch.</p>
           <pre><code>{serviceCommand}</code></pre>
         </article>
         <article>
@@ -188,10 +225,31 @@ const productCards = [
         </article>
         <article>
           <span>04</span>
-          <h3>Connect an agent through Streamable HTTP MCP and the skill</h3>
+          <h3>Connect an agent through Streamable HTTP MCP</h3>
           <p>Point the agent at the long-running <code>/mcp</code> service endpoint instead of opening the database from a new stdio process. Keep <code>serve mcp</code> only as a fallback for runtimes that do not support remote MCP.</p>
           <pre><code>{mcpAgentConfig}</code></pre>
         </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section docs-map-section">
+    <div class="page-shell docs-map-layout">
+      <div class="section-intro">
+        <p class="section-label">Docs map</p>
+        <h2>The useful repo docs are now first-class website pages.</h2>
+        <p>
+          kube-insight's project repository now separates user, operator, and contributor docs. The website keeps the public paths task-oriented: agent setup, investigation cases, configuration, evidence vocabulary, and security boundaries are reachable without reading the repository tree.
+        </p>
+      </div>
+      <div class="docs-highlight-grid">
+        {docsHighlights.map((item) => (
+          <a class="docs-highlight" href={item.href}>
+            <span>{item.label}</span>
+            <strong>{item.title}</strong>
+            <p>{item.text}</p>
+          </a>
+        ))}
       </div>
     </div>
   </section>
@@ -542,6 +600,79 @@ const productCards = [
     padding-block: 4rem;
   }
 
+  .demo-section {
+    background: var(--color-page);
+  }
+
+  .demo-layout {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .demo-layout code {
+    color: var(--color-text);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.92em;
+  }
+
+  .demo-player {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: #020617;
+    box-shadow: var(--shadow-surface);
+    color: #e5edf8;
+    overflow: hidden;
+  }
+
+  .demo-video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    min-height: 20rem;
+    background: #020617;
+    object-fit: contain;
+  }
+
+  .demo-video-caption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-top: 1px solid rgba(226, 232, 240, 0.16);
+    background:
+      linear-gradient(rgba(148, 163, 184, 0.09) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+      #0f172a;
+    background-size: 2.4rem 2.4rem;
+    padding: 0.9rem 1rem;
+  }
+
+  .demo-video-caption span {
+    color: #cbd5e1;
+    font-size: 0.86rem;
+    line-height: 1.45;
+  }
+
+  .demo-video-caption a {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.45rem;
+    border: 1px solid rgba(226, 232, 240, 0.24);
+    border-radius: var(--radius-sm);
+    background: #e5edf8;
+    color: #0f172a;
+    padding: 0.62rem 0.78rem;
+    font-size: 0.86rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  .demo-video-caption a:hover {
+    background: #bfdbfe;
+  }
+
   .quickstart-section {
     background: var(--color-surface);
   }
@@ -613,6 +744,56 @@ const productCards = [
 
   .quickstart-steps code {
     font-family: "IBM Plex Mono", ui-monospace, monospace;
+  }
+
+  .docs-map-section {
+    background: var(--color-surface-soft);
+  }
+
+  .docs-map-layout {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .docs-highlight-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .docs-highlight {
+    display: grid;
+    gap: 0.65rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-page);
+    padding: 1.15rem;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .docs-highlight span {
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  .docs-highlight strong {
+    font-size: 1.08rem;
+    line-height: 1.3;
+  }
+
+  .docs-highlight p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .docs-highlight:hover {
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-surface);
   }
 
   .white-section {
@@ -782,6 +963,10 @@ const productCards = [
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
+    .docs-highlight-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .metrics-grid article {
       border-bottom: 0;
       border-right: 1px solid var(--color-border);
@@ -821,8 +1006,17 @@ const productCards = [
       align-items: start;
     }
 
+    .demo-layout {
+      grid-template-columns: minmax(20rem, 0.5fr) minmax(0, 1fr);
+    }
+
     .quickstart {
       grid-template-columns: minmax(0, 1fr) minmax(0, 0.78fr);
+      align-items: start;
+    }
+
+    .docs-map-layout {
+      grid-template-columns: minmax(18rem, 0.46fr) minmax(0, 1fr);
       align-items: start;
     }
 

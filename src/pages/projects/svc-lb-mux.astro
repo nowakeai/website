@@ -45,6 +45,15 @@ const roadmapItems = [
   "Provider validation reports for GKE, EKS, and additional Kubernetes environments.",
   "Debug UI rewrite with safer auth, modular diagnostics, and operator-focused topology views.",
 ] as const;
+
+const docsHighlights = [
+  { label: "Start", title: "Getting Started", text: "Install the chart, create a mux Service, expose a first channel, and validate status and endpoints.", href: "/docs/svc-lb-mux/getting-started/" },
+  { label: "Concept", title: "Mux And Channel Services", text: "Understand public ports, target ports, automatic allocation, state ConfigMaps, and external-dns aggregation.", href: "/docs/svc-lb-mux/concepts/mux-and-channel-services/" },
+  { label: "Examples", title: "Tutorials", text: "Copyable examples for HTTP, TCP, migration, external-dns aggregation, capacity splitting, and GitOps.", href: "/docs/svc-lb-mux/guides/tutorials/" },
+  { label: "Providers", title: "GKE And AWS NLB", text: "Provider-specific setup notes, static IP configuration, firewall behavior, and capacity boundaries.", href: "/docs/svc-lb-mux/providers/gke/" },
+  { label: "Operate", title: "GitOps And Troubleshooting", text: "Separate desired config from runtime fields and diagnose missing mux ports, pending ingress, backend readiness, and drift.", href: "/docs/svc-lb-mux/operations/troubleshooting/" },
+  { label: "Internals", title: "Controller Design", text: "Read the ownership model, generated endpoints, mux annotations, events, and current controller limits.", href: "/docs/svc-lb-mux/architecture/controller-design/" },
+] as const;
 ---
 
 <BaseLayout
@@ -141,7 +150,7 @@ const roadmapItems = [
           <span>01</span>
           <h3>Install the controller</h3>
           <pre><code>helm install svc-mux oci://ghcr.io/nowakeai/charts/svc-lb-mux \
-  --version 0.1.1 \
+  --version 0.1.2 \
   --namespace svc-mux \
   --create-namespace</code></pre>
         </article>
@@ -241,6 +250,27 @@ kubectl get endpoints mux -n svc-mux</code></pre>
     </div>
   </section>
 
+  <section class="section docs-map-section">
+    <div class="page-shell docs-map-layout">
+      <div class="section-intro">
+        <p class="section-label">Docs map</p>
+        <h2>The repo docs are organized around the operator workflow.</h2>
+        <p>
+          svc-lb-mux has a smaller scope than kube-insight, so the docs stay practical: install, understand channel mapping, copy examples, tune provider behavior, and debug controller-owned runtime state.
+        </p>
+      </div>
+      <div class="docs-highlight-grid">
+        {docsHighlights.map((item) => (
+          <a class="docs-highlight" href={item.href}>
+            <span>{item.label}</span>
+            <strong>{item.title}</strong>
+            <p>{item.text}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
   <section class="section white-section roadmap-section">
     <div class="page-shell roadmap-layout">
       <div>
@@ -326,6 +356,14 @@ kubectl get endpoints mux -n svc-mux</code></pre>
   .quickstart-steps h3 { margin: 0.45rem 0 0; font-size: 1rem; }
   .quickstart-steps pre { margin: 0.9rem 0 0; overflow-x: auto; border-radius: var(--radius-sm); background: #0f172a; color: #e5edf8; padding: 1rem; font-size: 0.78rem; line-height: 1.55; }
   .quickstart-steps code { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  .docs-map-section { background: var(--color-surface-soft); }
+  .docs-map-layout { display: grid; gap: 2rem; }
+  .docs-highlight-grid { display: grid; gap: 1rem; }
+  .docs-highlight { display: grid; gap: 0.65rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-page); padding: 1.15rem; color: var(--color-text); text-decoration: none; }
+  .docs-highlight span { color: var(--color-accent); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; font-weight: 650; text-transform: uppercase; }
+  .docs-highlight strong { font-size: 1.08rem; line-height: 1.3; }
+  .docs-highlight p { margin: 0; color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.6; }
+  .docs-highlight:hover { border-color: var(--color-border-strong); box-shadow: var(--shadow-surface); }
   .white-section { background: var(--color-surface); }
   .section-label { margin: 0; color: var(--color-accent); font-size: 0.875rem; font-weight: 650; }
   .section h2 { margin: 0.75rem 0 0; font-size: clamp(1.8rem, 3vw, 2.65rem); line-height: 1.1; font-weight: 650; }
@@ -367,6 +405,7 @@ kubectl get endpoints mux -n svc-mux</code></pre>
     .scenario-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .operating-table { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .provider-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .docs-highlight-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .mux-row { grid-template-columns: 1fr 1fr 1fr; }
     .external-row { grid-template-columns: 1fr auto 1fr; }
     .external-row span { display: block; height: 1px; min-width: 4rem; background: var(--color-border-strong); padding: 0; border: 0; }
@@ -376,6 +415,7 @@ kubectl get endpoints mux -n svc-mux</code></pre>
     .mux-hero-grid { grid-template-columns: minmax(0, 0.95fr) minmax(28rem, 0.85fr); padding-block: 5rem; }
     .quickstart-layout { grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr); align-items: start; }
     .scenario-layout, .mechanics-layout, .operating-layout, .roadmap-layout { grid-template-columns: minmax(0, 0.72fr) minmax(28rem, 1fr); align-items: start; }
+    .docs-map-layout { grid-template-columns: minmax(0, 0.72fr) minmax(28rem, 1fr); align-items: start; }
     .provider-layout { grid-template-columns: minmax(0, 0.8fr) minmax(26rem, 1.1fr); align-items: start; }
     .provider-layout .provider-grid { grid-column: 2; grid-row: 1; grid-template-columns: 1fr; }
   }

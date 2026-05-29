@@ -5,7 +5,7 @@ project: nowake-ai
 category: overview
 audience: platform-engineer
 status: preview
-last_verified: 2026-05-28
+last_verified: 2026-05-29
 source_repo: nowakeai/website
 source_path: DOCS_SITE_PLAN.md
 sidebar:
@@ -27,17 +27,27 @@ Start with the project overview that matches the system you are evaluating:
 - Use [kube-insight](/docs/kube-insight/) when you need retained Kubernetes state for investigation, automation, or agent workflows.
 - Use [svc-lb-mux](/docs/svc-lb-mux/) when cloud provider load balancer count, cost, or port management is becoming operationally painful.
 
+## Agent And UI Workflows
+
+kube-insight now publishes both agent paths:
+
+- [Built-in Web UI Agent](/docs/kube-insight/guides/builtin-webui-agent/) for running the agent loop inside kube-insight with server-side credentials.
+- [External Agent Skill](/docs/kube-insight/guides/external-agent-skill/) for connecting Codex, Claude, or another MCP-capable agent to the evidence service.
+- [Agent SQL Workflows](/docs/kube-insight/guides/agent-sql-workflows/) for schema-first retained-evidence investigations.
+
 ## Operations
 
 The docs prioritize install paths, validation commands, GitOps guidance, provider limits, troubleshooting flows, and realistic expected output.
+
+Key kube-insight operations pages now include [Configuration](/docs/kube-insight/operations/configuration/), [Processing Model](/docs/kube-insight/operations/processing-model/), [Troubleshooting Workflows](/docs/kube-insight/operations/troubleshooting-workflows/), [Validated Troubleshooting Scenarios](/docs/kube-insight/operations/validated-troubleshooting-scenarios/), and the [Service-Mux History Case Report](/docs/kube-insight/operations/service-mux-history-case-report/).
+
+svc-lb-mux operations docs include [GitOps](/docs/svc-lb-mux/operations/gitops/), [Troubleshooting](/docs/svc-lb-mux/operations/troubleshooting/), and [Pressure Testing](/docs/svc-lb-mux/operations/pressure-testing/).
 
 ## Security
 
 Public docs should state trust boundaries, sanitization behavior, permissions, sensitive data handling, and current gaps near the commands or configuration they affect.
 
-## Agent-friendly Docs
-
-Agent-oriented pages should include stable nouns, schemas, commands, failure signals, and expected outputs so future agents can reason from the same operational evidence as human operators.
+kube-insight security docs include current [Sanitization And Retention](/docs/kube-insight/security/sanitization-and-retention/) behavior plus roadmap design notes for [Kubernetes RBAC Inheritance](/docs/kube-insight/security/kubernetes-rbac-inheritance/) and [Agent SQL RBAC Filtering](/docs/kube-insight/security/agent-rbac-sql-filtering/).
 
 ## Source Model
 

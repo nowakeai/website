@@ -5,7 +5,7 @@ project: kube-insight
 category: overview
 audience: platform-engineer
 status: preview
-last_verified: 2026-05-28
+last_verified: 2026-05-29
 source_repo: nowakeai/kube-insight
 source_path: docs/README.md
 agent_friendly: true
@@ -15,16 +15,32 @@ sidebar:
 
 `kube-insight` preserves useful Kubernetes infrastructure history so operators and agents can investigate what changed, what existed before, and how resources relate over time.
 
-Use this section for retained evidence concepts, the data model, ingestion and extraction behavior, storage modes, performance validation, sanitization, the embedded Web UI, MCP/API service mode, and agent SQL workflows.
+Use this section for retained evidence concepts, the data model, facts catalog, ingestion and extraction behavior, storage modes, performance validation, sanitization, the embedded Web UI, MCP/API service mode, and agent workflows.
 
-## Current Public Entry Points
+## Start Here
 
 - [Getting Started](/docs/kube-insight/getting-started/)
+- [Built-in Web UI Agent](/docs/kube-insight/guides/builtin-webui-agent/)
+- [External Agent Skill](/docs/kube-insight/guides/external-agent-skill/)
 - [Agent SQL Workflows](/docs/kube-insight/guides/agent-sql-workflows/)
-- [System Architecture](/docs/kube-insight/architecture/system-architecture/)
+- [Configuration](/docs/kube-insight/operations/configuration/)
+- [Troubleshooting Workflows](/docs/kube-insight/operations/troubleshooting-workflows/)
+
+## Evidence And Cases
+
+- [Real-World Cases](/docs/kube-insight/guides/real-world-cases/)
+- [Validated Troubleshooting Scenarios](/docs/kube-insight/operations/validated-troubleshooting-scenarios/)
+- [Service-Mux History Case Report](/docs/kube-insight/operations/service-mux-history-case-report/)
+- [Facts Catalog](/docs/kube-insight/concepts/facts-catalog/)
 - [Performance Validation](/docs/kube-insight/operations/performance-validation/)
-- [Project page](/projects/kube-insight/)
-- [GitHub repository](https://github.com/nowakeai/kube-insight)
+
+## Architecture And Security
+
+- [System Architecture](/docs/kube-insight/architecture/system-architecture/)
+- [Technology Stack](/docs/kube-insight/architecture/technology-stack/)
+- [Kubernetes RBAC Inheritance](/docs/kube-insight/security/kubernetes-rbac-inheritance/)
+- [Agent SQL RBAC Filtering](/docs/kube-insight/security/agent-rbac-sql-filtering/)
+- [Roadmap](/docs/kube-insight/roadmap/)
 
 ## Source Boundary
 

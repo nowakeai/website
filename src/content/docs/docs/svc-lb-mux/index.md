@@ -5,7 +5,7 @@ project: svc-lb-mux
 category: overview
 audience: platform-engineer
 status: preview
-last_verified: 2026-05-28
+last_verified: 2026-05-29
 source_repo: nowakeai/svc-lb-mux
 source_path: docs/README.md
 sidebar:

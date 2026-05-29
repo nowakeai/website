@@ -3,7 +3,7 @@
   "defaults": {
     "audience": "platform-engineer",
     "status": "preview",
-    "last_verified": "2026-05-28",
+    "last_verified": "2026-05-29",
     "source_branch": "main"
   },
   "projects": [
@@ -104,28 +104,37 @@
       "targetRoot": "src/content/docs/docs/kube-insight",
       "pages": [
         {
-          "source": "docs/quickstart.md",
+          "source": "docs/users/getting-started/quickstart.md",
           "target": "getting-started.md",
           "title": "Getting Started",
-          "description": "Install kube-insight and start collecting retained Kubernetes evidence in a local environment.",
+          "description": "Install kube-insight, capture Kubernetes evidence, and run the local Web UI, API, and MCP service.",
           "category": "guide"
         },
         {
-          "source": "docs/requirements/product-brief.md",
+          "source": "docs/users/getting-started/product-brief.md",
           "target": "concepts/retained-evidence.md",
           "title": "Retained Evidence",
           "description": "Why kube-insight preserves Kubernetes history and how retained evidence supports investigations.",
           "category": "concept"
         },
         {
-          "source": "docs/data/data-model.md",
-          "target": "concepts/data-model.md",
-          "title": "Data Model",
-          "description": "User-facing overview of kube-insight versions, facts, edges, observations, and queryable state.",
-          "category": "concept"
+          "source": "docs/users/tutorials/builtin-webui-agent.md",
+          "target": "guides/builtin-webui-agent.md",
+          "title": "Built-in Web UI Agent",
+          "description": "Configure the server-side LLM provider, start serve --app, and investigate retained evidence through the embedded Web UI.",
+          "category": "guide",
+          "agent_friendly": true
         },
         {
-          "source": "docs/workflows/agent-sql-cookbook.md",
+          "source": "docs/users/tutorials/external-agent-skill.md",
+          "target": "guides/external-agent-skill.md",
+          "title": "External Agent Skill",
+          "description": "Connect Codex, Claude, or another external agent to kube-insight through MCP or the read-only HTTP API.",
+          "category": "guide",
+          "agent_friendly": true
+        },
+        {
+          "source": "docs/users/workflows/agent-sql-cookbook.md",
           "target": "guides/agent-sql-workflows.md",
           "title": "Agent SQL Workflows",
           "description": "Concrete SQL workflows for agents and operators investigating retained Kubernetes evidence.",
@@ -133,32 +142,126 @@
           "agent_friendly": true
         },
         {
-          "source": "docs/validation/storage-mode-comparison.md",
+          "source": "docs/users/workflows/real-world-cases.md",
+          "target": "guides/real-world-cases.md",
+          "title": "Real-World Cases",
+          "description": "Practical incident patterns that kube-insight answers with retained history, facts, topology edges, and read-only SQL.",
+          "category": "guide",
+          "agent_friendly": true
+        },
+        {
+          "source": "docs/users/workflows/troubleshooting-workflows.md",
+          "target": "operations/troubleshooting-workflows.md",
+          "title": "Troubleshooting Workflows",
+          "description": "Workflow shapes for service latency, OOMKilled history, Pod eviction, webhook failures, and RBAC regressions.",
+          "category": "troubleshooting",
+          "agent_friendly": true
+        },
+        {
+          "source": "docs/users/workflows/validated-troubleshooting-scenarios.md",
+          "target": "operations/validated-troubleshooting-scenarios.md",
+          "title": "Validated Troubleshooting Scenarios",
+          "description": "Acceptance scenarios proving generic retained evidence can explain webhook, RBAC, CRD, HPA, and EndpointSlice incidents.",
+          "category": "operations",
+          "agent_friendly": true
+        },
+        {
+          "source": "docs/users/workflows/service-mux-history-case-report.md",
+          "target": "operations/service-mux-history-case-report.md",
+          "title": "Service-Mux History Case Report",
+          "description": "An anonymized real GKE case report reconstructing short-lived service-mux resources from kube-insight history.",
+          "category": "operations",
+          "applies_to": [
+            "GKE"
+          ]
+        },
+        {
+          "source": "docs/users/reference/storage-mode-comparison.md",
           "target": "operations/performance-validation.md",
           "title": "Performance Validation",
           "description": "Measured kube-insight storage and query behavior with explicit scope and freshness caveats.",
           "category": "operations"
         },
         {
-          "source": "docs/security/security-retention.md",
+          "source": "docs/operators/configuration/configuration.md",
+          "target": "operations/configuration.md",
+          "title": "Configuration",
+          "description": "Runtime config validation, effective config output, storage drivers, environment variables, and server mode settings.",
+          "category": "operations"
+        },
+        {
+          "source": "docs/operators/configuration/processing-model.md",
+          "target": "operations/processing-model.md",
+          "title": "Processing Model",
+          "description": "Resource profile rules, filters, extractors, retention policies, and normalized processing configuration.",
+          "category": "operations"
+        },
+        {
+          "source": "docs/operators/data/data-model.md",
+          "target": "concepts/data-model.md",
+          "title": "Data Model",
+          "description": "User-facing overview of kube-insight versions, facts, edges, observations, and queryable state.",
+          "category": "concept"
+        },
+        {
+          "source": "docs/operators/data/facts-catalog.md",
+          "target": "concepts/facts-catalog.md",
+          "title": "Facts Catalog",
+          "description": "Current extracted fact families, storage shape, growth risks, and fact add/remove checklist.",
+          "category": "concept"
+        },
+        {
+          "source": "docs/operators/security/security-retention.md",
           "target": "security/sanitization-and-retention.md",
           "title": "Sanitization And Retention",
           "description": "Sensitive-data handling, sanitization behavior, retention boundaries, and security notes.",
           "category": "security"
         },
         {
-          "source": "docs/architecture/system-architecture.md",
+          "source": "docs/contributors/security/kubernetes-rbac-inheritance.md",
+          "target": "security/kubernetes-rbac-inheritance.md",
+          "title": "Kubernetes RBAC Inheritance",
+          "description": "Future authorization design for making kube-insight inherit Kubernetes RBAC across raw and derived evidence.",
+          "category": "security",
+          "status": "roadmap"
+        },
+        {
+          "source": "docs/contributors/security/agent-rbac-sql-filtering.md",
+          "target": "security/agent-rbac-sql-filtering.md",
+          "title": "Agent SQL RBAC Filtering",
+          "description": "Future design for constraining flexible SQL so agent answers only include evidence authorized for the caller.",
+          "category": "security",
+          "status": "roadmap",
+          "agent_friendly": true
+        },
+        {
+          "source": "docs/contributors/architecture/system-architecture.md",
           "target": "architecture/system-architecture.md",
           "title": "System Architecture",
           "description": "kube-insight system architecture, control flow, storage, and query surfaces.",
           "category": "architecture"
         },
         {
-          "source": "docs/ingestion/ingestion-and-extraction.md",
+          "source": "docs/operators/ingestion/ingestion-and-extraction.md",
           "target": "architecture/ingestion-and-extraction.md",
           "title": "Ingestion And Extraction",
           "description": "How kube-insight watches Kubernetes resources and extracts facts, edges, and observations.",
           "category": "architecture"
+        },
+        {
+          "source": "docs/contributors/architecture/technology-stack.md",
+          "target": "architecture/technology-stack.md",
+          "title": "Technology Stack",
+          "description": "Implementation stack choices for the collector, API, CLI, local storage, central evidence backend, and UI.",
+          "category": "architecture"
+        },
+        {
+          "source": "docs/contributors/roadmap/roadmap.md",
+          "target": "roadmap.md",
+          "title": "Roadmap",
+          "description": "Current kube-insight foundation, next milestones, deferred work, and release direction.",
+          "category": "roadmap",
+          "status": "roadmap"
         }
       ],
       "nav_order": 10
