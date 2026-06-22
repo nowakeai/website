@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="betternat-traffic-title betternat-traffic-desc" viewBox="0 0 760 360">
+  <title id="betternat-traffic-title">Download-heavy NAT traffic shape</title>
+  <desc id="betternat-traffic-desc">
+    A small outbound request from a private workload can return a much larger public internet response. Managed NAT
+    Gateway meters both directions, while BetterNAT replaces the NAT processing line with appliance cost.
+  </desc>
+  <defs>
+    <marker id="traffic-arrow-small" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" refX="13.5" refY="8" orient="auto">
+      <path d="M1.5,1.5 L14.5,8 L1.5,14.5 Z" fill="#7b8493" />
+    </marker>
+    <marker id="traffic-arrow-large" markerUnits="userSpaceOnUse" markerWidth="22" markerHeight="22" refX="19" refY="11" orient="auto">
+      <path d="M2,2 L20,11 L2,20 Z" fill="#2563eb" />
+    </marker>
+  </defs>
+  <style>
+    .traffic-frame,
+    .traffic-node rect,
+    .traffic-meter rect {
+      vector-effect: non-scaling-stroke;
+    }
+
+    .traffic-frame {
+      fill: #ffffff;
+      stroke: #d9e1ec;
+    }
+
+    .traffic-node rect,
+    .traffic-meter rect {
+      fill: #ffffff;
+      stroke: #b9c6d8;
+    }
+
+    .better-meter rect {
+      fill: #e9f8f1;
+      stroke: #8ccbb4;
+    }
+
+    text {
+      fill: #171b24;
+      font-family: "Geist", system-ui, sans-serif;
+      font-size: 15px;
+      font-weight: 650;
+    }
+
+    .mono,
+    .traffic-label {
+      fill: #667085;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 13px;
+    }
+
+    .traffic-request,
+    .traffic-response {
+      fill: none;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .traffic-request {
+      stroke: #7b8493;
+      stroke-width: 3;
+      marker-end: url("#traffic-arrow-small");
+    }
+
+    .traffic-response {
+      stroke: #2563eb;
+      stroke-width: 7;
+      marker-end: url("#traffic-arrow-large");
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .traffic-response {
+        animation: flow-pulse 2.8s linear infinite;
+        stroke-dasharray: 14 10;
+      }
+    }
+
+    @keyframes flow-pulse {
+      to {
+        stroke-dashoffset: -48;
+      }
+    }
+  </style>
+
+  <rect class="traffic-frame" x="18" y="18" width="724" height="324" rx="8" />
+  <g class="traffic-node">
+    <rect x="58" y="90" width="192" height="86" rx="8" />
+    <text x="86" y="126">private workload</text>
+    <text class="mono" x="86" y="150">small request</text>
+  </g>
+  <g class="traffic-node">
+    <rect x="510" y="90" width="192" height="86" rx="8" />
+    <text x="560" y="126">public internet</text>
+    <text class="mono" x="560" y="150">large response</text>
+  </g>
+  <path class="traffic-request" d="M250 118 H510" />
+  <path class="traffic-response" d="M510 154 H250" />
+  <text class="traffic-label" x="342" y="104">request</text>
+  <text class="traffic-label" x="318" y="190">download response</text>
+
+  <g class="traffic-meter">
+    <rect x="58" y="236" width="292" height="70" rx="8" />
+    <text class="mono" x="82" y="265">managed path</text>
+    <text x="82" y="288">NAT Gateway meters both directions</text>
+  </g>
+  <g class="traffic-meter better-meter">
+    <rect x="410" y="236" width="292" height="70" rx="8" />
+    <text class="mono" x="434" y="265">BetterNAT path</text>
+    <text x="434" y="288">appliance cost replaces processing GB</text>
+  </g>
+</svg>

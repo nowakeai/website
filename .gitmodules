@@ -6,3 +6,7 @@
 	path = vendor/svc-lb-mux
 	url = ../svc-lb-mux
 	branch = main
+[submodule "vendor/betternat"]
+	path = vendor/betternat
+	url = ../betternat
+	branch = main

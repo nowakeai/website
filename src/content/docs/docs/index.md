@@ -20,12 +20,15 @@ This documentation site collects public, task-oriented documentation for nowake.
 
 [svc-lb-mux](/docs/svc-lb-mux/) is an operations-first Kubernetes controller that lets multiple application-facing `LoadBalancer` Services share one provider-managed Layer 4 load balancer, including channel-driven external-dns aggregation.
 
+[BetterNAT](/docs/betternat/) is a self-owned, observable egress gateway for high-volume AWS private subnet workloads where NAT Gateway processing fees become a visible cost problem.
+
 ## Getting Started
 
 Start with the project overview that matches the system you are evaluating:
 
 - Use [kube-insight](/docs/kube-insight/) when you need retained Kubernetes state for investigation, automation, or agent workflows.
 - Use [svc-lb-mux](/docs/svc-lb-mux/) when cloud provider load balancer count, cost, or port management is becoming operationally painful.
+- Use [BetterNAT](/docs/betternat/) when private subnet workloads move enough public internet traffic that managed NAT processing fees deserve an explicit cost and operations tradeoff.
 
 ## Agent And UI Workflows
 
@@ -43,11 +46,15 @@ Key kube-insight operations pages now include [Configuration](/docs/kube-insight
 
 svc-lb-mux operations docs include [GitOps](/docs/svc-lb-mux/operations/gitops/), [Troubleshooting](/docs/svc-lb-mux/operations/troubleshooting/), and [Pressure Testing](/docs/svc-lb-mux/operations/pressure-testing/).
 
+BetterNAT operations docs include [Observability](/docs/betternat/operations/observability/), [Operations Guide](/docs/betternat/operations/operations-guide/), [Rollback](/docs/betternat/operations/rollback/), [Failure Modes](/docs/betternat/operations/failure-modes/), and [Current Limits](/docs/betternat/roadmap/).
+
 ## Security
 
 Public docs should state trust boundaries, sanitization behavior, permissions, sensitive data handling, and current gaps near the commands or configuration they affect.
 
 kube-insight security docs include current [Sanitization And Retention](/docs/kube-insight/security/sanitization-and-retention/) behavior plus roadmap design notes for [Kubernetes RBAC Inheritance](/docs/kube-insight/security/kubernetes-rbac-inheritance/) and [Agent SQL RBAC Filtering](/docs/kube-insight/security/agent-rbac-sql-filtering/).
+
+BetterNAT security docs include [IAM Policy](/docs/betternat/security/iam-policy/) and [Security Hardening](/docs/betternat/security/security-hardening/) for the alpha AWS appliance model.
 
 ## Source Model
 

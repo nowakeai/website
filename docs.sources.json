@@ -98,6 +98,109 @@
       "nav_order": 20
     },
     {
+      "project": "betternat",
+      "source_repo": "nowakeai/betternat",
+      "localPath": "vendor/betternat",
+      "targetRoot": "src/content/docs/docs/betternat",
+      "pages": [
+        {
+          "source": "docs/user/QUICK_START.md",
+          "target": "getting-started.md",
+          "title": "Getting Started",
+          "description": "Install BetterNAT in a disposable AWS VPC, verify egress, and clean up safely.",
+          "category": "guide"
+        },
+        {
+          "source": "docs/user/COST_MODEL.md",
+          "target": "concepts/cost-model.md",
+          "title": "Cost Model",
+          "description": "Understand NAT Gateway processing fees, BetterNAT appliance costs, directionality, and estimate formulas.",
+          "category": "concept",
+          "applies_to": [
+            "AWS"
+          ]
+        },
+        {
+          "source": "docs/user/EXISTING_VPC_INSTALL.md",
+          "target": "guides/existing-vpc-install.md",
+          "title": "Existing VPC Install",
+          "description": "Adopt BetterNAT in an existing VPC with route ownership and rollback warnings.",
+          "category": "guide",
+          "applies_to": [
+            "AWS"
+          ]
+        },
+        {
+          "source": "docs/user/CONFIGURATION.md",
+          "target": "reference/configuration.md",
+          "title": "Configuration",
+          "description": "Terraform betternat_gateway inputs, runtime config, and practical configuration notes.",
+          "category": "reference"
+        },
+        {
+          "source": "docs/user/IAM_POLICY.md",
+          "target": "security/iam-policy.md",
+          "title": "IAM Policy",
+          "description": "Terraform execution and gateway runtime IAM requirements for BetterNAT.",
+          "category": "security",
+          "applies_to": [
+            "AWS"
+          ]
+        },
+        {
+          "source": "docs/user/SECURITY_HARDENING.md",
+          "target": "security/security-hardening.md",
+          "title": "Security Hardening",
+          "description": "Alpha security posture, IAM and network hardening, artifact integrity, and production checklist.",
+          "category": "security"
+        },
+        {
+          "source": "docs/user/OBSERVABILITY_GUIDE.md",
+          "target": "operations/observability.md",
+          "title": "Observability",
+          "description": "Prometheus metrics, CLI checks, AWS cross-checks, alerts, attribution scope, and observability limits.",
+          "category": "operations"
+        },
+        {
+          "source": "docs/user/OPERATIONS_GUIDE.md",
+          "target": "operations/operations-guide.md",
+          "title": "Operations Guide",
+          "description": "Day-2 BetterNAT operations, diagnostics, AWS checks, SSM access, troubleshooting, and cleanup.",
+          "category": "operations"
+        },
+        {
+          "source": "docs/user/ROLLBACK_GUIDE.md",
+          "target": "operations/rollback.md",
+          "title": "Rollback",
+          "description": "Safe destroy, private route restoration, manual rollback, and residual-resource checks.",
+          "category": "operations"
+        },
+        {
+          "source": "docs/user/UPGRADE_REPLACEMENT_GUIDE.md",
+          "target": "operations/upgrade-and-replacement.md",
+          "title": "Upgrade And Replacement",
+          "description": "In-place capacity updates, explicit replacement, blue-green upgrade workflow, and alpha rolling-upgrade limits.",
+          "category": "operations"
+        },
+        {
+          "source": "docs/user/FAILURE_MODES.md",
+          "target": "operations/failure-modes.md",
+          "title": "Failure Modes",
+          "description": "BetterNAT failure-mode behavior, failover expectations, and current limitations.",
+          "category": "operations"
+        },
+        {
+          "source": "docs/user/LIMITATIONS.md",
+          "target": "roadmap.md",
+          "title": "Current Limits",
+          "description": "Alpha limitations, AWS scope, SLA caveats, failover behavior, cost caveats, and deferred validation.",
+          "category": "roadmap",
+          "status": "roadmap"
+        }
+      ],
+      "nav_order": 30
+    },
+    {
       "project": "kube-insight",
       "source_repo": "nowakeai/kube-insight",
       "localPath": "vendor/kube-insight",

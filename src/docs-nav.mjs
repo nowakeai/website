@@ -6,6 +6,7 @@ const manifestPath = path.resolve(process.cwd(), "docs.sources.json");
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
 
 const projectLabels = {
+  betternat: "BetterNAT",
   "kube-insight": "kube-insight",
   "svc-lb-mux": "svc-lb-mux",
 };
@@ -15,6 +16,7 @@ const groupLabels = {
   concepts: "Concepts",
   guides: "Guides",
   providers: "Providers",
+  reference: "Reference",
   operations: "Operations",
   security: "Security",
   architecture: "Architecture",
@@ -29,6 +31,7 @@ const groupOrder = [
   "concepts",
   "guides",
   "providers",
+  "reference",
   "operations",
   "security",
   "architecture",
@@ -70,7 +73,7 @@ const routeForTarget = (project, target) => {
 const groupKeyForTarget = (target) => {
   const [first] = target.split("/");
   if (target === "roadmap.md" || target === "roadmap.mdx") return "roadmap";
-  if (["concepts", "guides", "providers", "operations", "security", "architecture"].includes(first)) {
+  if (["concepts", "guides", "providers", "reference", "operations", "security", "architecture"].includes(first)) {
     return first;
   }
   return "root";

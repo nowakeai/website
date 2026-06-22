@@ -1,0 +1,774 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Icon from "../../components/Icons.astro";
+
+const heroProof = [
+  { value: "69%", label: "can save about 69% of the cost (50 TB/month, 80% ingress)" },
+  { value: "eBPF", label: "LoxiLB datapath avoids iptables and nf_conntrack pressure" },
+  { value: "HA", label: "multi-instance route/EIP ownership with decentralized failover" },
+] as const;
+
+const costRows = [
+  { label: "NAT processing + gateway/appliance", nat: "$2,337", betternat: "$73" },
+  { label: "Standard internet egress transfer on 10 TB", nat: "$922", betternat: "$922" },
+  { label: "Example monthly total", nat: "$3,258/mo", betternat: "$995/mo", total: true },
+  { label: "Example savings", nat: "-", betternat: "$2,264/mo (69%)", save: true },
+] as const;
+
+const directionRows = [
+  { mix: "80% ingress / 20% egress", nat: "$3,258", betternat: "$995", savings: "$2,264", percent: "69%" },
+  { mix: "50% ingress / 50% egress", nat: "$4,641", betternat: "$2,377", savings: "$2,264", percent: "49%" },
+  { mix: "20% ingress / 80% egress", nat: "$6,023", betternat: "$3,759", savings: "$2,264", percent: "38%" },
+] as const;
+
+const assumptionChips = [
+  "50 TB/month NAT-layer traffic",
+  "80% ingress hero case",
+  "$0.045/GB NAT processing",
+  "$0.045/hour NAT Gateway",
+  "2 x $0.05/hour appliances",
+  "$0.09/GB illustrative egress",
+] as const;
+
+const costBars = [
+  { label: "NAT Gateway", amount: "$3,258/mo", width: "100%" },
+  { label: "BetterNAT", amount: "$995/mo", width: "31%" },
+] as const;
+
+const performanceItems = [
+  {
+    value: "eBPF",
+    title: "Fast datapath",
+    text: "LoxiLB datapath, built for load balancing and NAT without iptables and nf_conntrack chain traversal.",
+  },
+  {
+    value: "EC2",
+    title: "Explicit sizing",
+    text: "Throughput is controlled by instance type, ENA/network limits, and appliance count.",
+  },
+  {
+    value: "N+1",
+    title: "Self-healing failover",
+    text: "DynamoDB lease fencing plus route/EIP takeover recovers new-flow egress automatically.",
+  },
+] as const;
+
+const quickstartSteps = [
+  "Start in a disposable VPC.",
+  "Let `betternat_gateway` own the private default route.",
+  "Verify egress, metrics, and live diagnostics before existing-VPC adoption.",
+] as const;
+
+const terraformSnippet = [
+  'resource "betternat_gateway" "egress" {',
+  '  name   = "prod-egress-a"',
+  '  region = "us-west-2"',
+  "  vpc_id = aws_vpc.main.id",
+  "",
+  "  public_subnet_ids = {",
+  '    "us-west-2a" = aws_subnet.public_a.id',
+  "  }",
+  "",
+  "  private_route_table_ids = {",
+  '    "us-west-2a" = [aws_route_table.private_a.id]',
+  "  }",
+  "",
+  "  private_cidrs        = [aws_vpc.main.cidr_block]",
+  "  ami_id               = data.aws_ami.al2023_arm64.id",
+  '  instance_type        = "t4g.small"',
+  "  desired_capacity     = 2",
+  "  stable_egress_ip     = true",
+  "  prometheus_enabled   = true",
+  "  rollback_on_destroy  = true",
+  "  agent_binary_url     = var.agent_binary_url",
+  "  agent_binary_sha256  = var.agent_binary_sha256",
+  "  cli_binary_url       = var.cli_binary_url",
+  "  cli_binary_sha256    = var.cli_binary_sha256",
+  "}",
+].join("\n");
+
+const verifySnippet = [
+  "betternat doctor --live --config /etc/betternat/agent.json",
+  "curl -fsS https://checkip.amazonaws.com",
+  "curl -fsS http://<gateway-private-ip>:9108/metrics | head",
+].join("\n");
+---
+
+<BaseLayout
+  title="BetterNAT | nowake.ai"
+  description="BetterNAT is a self-owned, observable egress gateway for high-volume AWS private subnet workloads."
+  githubHref="https://github.com/nowakeai/betternat"
+  githubLabel="betternat"
+>
+  <section class="bn-hero">
+    <div class="page-shell hero-shell">
+      <div class="hero-copy">
+        <p class="eyebrow">BetterNAT / AWS alpha technical preview</p>
+        <h1>Replace the NAT Gateway bill line, not your VPC model.</h1>
+        <p class="hero-lede">
+          BetterNAT is a Terraform-installed EC2 appliance pool for private subnet egress. It targets high-volume,
+          download-heavy workloads where NAT Gateway per-GB processing is the expensive part.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button button-primary" href="#quickstart">
+            <Icon name="activity" class="icon-sm" />
+            Quickstart
+          </a>
+          <a class="button button-secondary" href="/docs/betternat/getting-started/">
+            <Icon name="book-open" class="icon-sm" />
+            Docs
+          </a>
+          <a class="button button-secondary" href="https://github.com/nowakeai/betternat">
+            <Icon name="github" class="icon-sm" />
+            GitHub
+          </a>
+        </div>
+      </div>
+
+      <figure class="architecture-panel" aria-label="BetterNAT AWS egress architecture">
+        <div class="diagram-kicker">
+          <span>AWS egress architecture</span>
+          <strong>data + control planes</strong>
+        </div>
+        <img
+          class="architecture-img"
+          src="/diagrams/betternat-architecture.svg"
+          alt="BetterNAT active gateway, standby gateway, Terraform, DynamoDB lease, and EIP architecture"
+        />
+      </figure>
+    </div>
+
+    <div class="page-shell proof-rail" aria-label="BetterNAT proof points">
+      {heroProof.map((item) => <div><strong>{item.value}</strong><span>{item.label}</span></div>)}
+    </div>
+  </section>
+
+  <section id="cost" class="content-section cost-section">
+    <div class="page-shell section-stack">
+      <div class="section-head">
+        <p class="section-label">Cost advantage</p>
+        <h2>Save about 69% of the cost in the 50 TB/month, 80% ingress model.</h2>
+      </div>
+
+      <div class="assumption-strip" aria-label="Cost model assumptions">
+        {assumptionChips.map((chip) => <span>{chip}</span>)}
+      </div>
+
+      <div class="cost-board">
+        <article class="cost-visual" aria-label="Monthly total comparison for 50 TB monthly traffic and 80 percent ingress">
+          <div class="cost-visual-head">
+            <span>Example monthly total</span>
+            <strong>$2,264/mo saved</strong>
+          </div>
+          <div class="bar-stack">
+            {costBars.map((bar) => (
+              <div class="bar-row">
+                <div class="bar-label">
+                  <span>{bar.label}</span>
+                  <strong>{bar.amount}</strong>
+                </div>
+                <div class="bar-track">
+                  <span style={`width: ${bar.width}`}></span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <div class="cost-table" aria-label="Illustrative monthly cost comparison">
+          <div class="cost-table-head">
+            <span>Monthly estimate</span>
+            <strong>NAT Gateway</strong>
+            <strong>BetterNAT</strong>
+          </div>
+          {costRows.map((row) => (
+            <div class:list={["cost-row", { "total-row": row.total }]}>
+              <span>{row.label}</span>
+              <strong>{row.nat}</strong>
+              <strong>{row.betternat}</strong>
+            </div>
+          ))}
+        </div>
+
+        <div class="direction-table" aria-label="Direction-sensitive BetterNAT savings scenarios">
+          <div class="direction-head">
+            <span>Traffic mix, 50 TB/month</span>
+            <strong>NAT Gateway</strong>
+            <strong>BetterNAT</strong>
+            <strong>Savings</strong>
+          </div>
+          {directionRows.map((row) => (
+            <div class="direction-row">
+              <span>{row.mix}</span>
+              <strong>{row.nat}</strong>
+              <strong>{row.betternat}</strong>
+              <strong>{row.savings} / {row.percent}</strong>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="performance" class="content-section">
+    <div class="page-shell section-stack">
+      <div class="section-head compact-head">
+        <p class="section-label">Performance + stability advantage</p>
+        <h2>eBPF datapath, explicit sizing, decentralized recovery.</h2>
+      </div>
+
+      <div class="performance-grid">
+        {performanceItems.map((item) => (
+          <article class="performance-card">
+            <strong>{item.value}</strong>
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="quickstart" class="content-section quickstart-section">
+    <div class="page-shell quickstart-layout">
+      <div class="quickstart-copy">
+        <p class="section-label">Quickstart</p>
+        <h2>One resource owns the appliance pool and private default route.</h2>
+        <ol>
+          {quickstartSteps.map((step) => <li>{step}</li>)}
+        </ol>
+        <div class="quickstart-actions">
+          <a class="button button-primary" href="/docs/betternat/getting-started/">
+            <Icon name="book-open" class="icon-sm" />
+            Full guide
+          </a>
+          <a class="button button-secondary" href="/docs/betternat/guides/existing-vpc-install/">
+            <Icon name="wrench" class="icon-sm" />
+            Existing VPC
+          </a>
+        </div>
+      </div>
+
+      <div class="quickstart-code" aria-label="BetterNAT Terraform and verification example">
+        <div class="code-block">
+          <span>terraform</span>
+          <pre><code>{terraformSnippet}</code></pre>
+        </div>
+        <div class="code-block verify-block">
+          <span>verify</span>
+          <pre><code>{verifySnippet}</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .bn-hero {
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-border);
+    background:
+      linear-gradient(90deg, rgba(23, 27, 36, 0.035) 1px, transparent 1px),
+      linear-gradient(rgba(23, 27, 36, 0.035) 1px, transparent 1px),
+      linear-gradient(135deg, #ffffff 0%, #f7f8fb 54%, #eef3fa 100%);
+    background-size: 36px 36px, 36px 36px, auto;
+  }
+
+  .hero-shell {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+    padding-block: 4.8rem 2.25rem;
+  }
+
+  .hero-shell > *,
+  .section-stack > *,
+  .quickstart-layout > * {
+    min-width: 0;
+  }
+
+  .hero-copy {
+    max-width: 58rem;
+  }
+
+  .eyebrow,
+  .section-label,
+  .cost-table-head,
+  .code-block span {
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  .hero-copy h1 {
+    max-width: 58rem;
+    margin: 1rem 0 0;
+    font-size: 3rem;
+    line-height: 0.98;
+    font-weight: 700;
+    overflow-wrap: break-word;
+  }
+
+  .hero-lede {
+    max-width: 50rem;
+    margin: 1.35rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 1.14rem;
+    line-height: 1.72;
+  }
+
+  .hero-actions,
+  .quickstart-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.7rem;
+  }
+
+  .architecture-panel {
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.86);
+    color: var(--color-text);
+    box-shadow: 0 24px 70px rgba(23, 27, 36, 0.14);
+  }
+
+  .diagram-kicker {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.85rem 1rem;
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  .diagram-kicker strong {
+    color: var(--color-text);
+  }
+
+  .architecture-img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    height: auto;
+    background: var(--color-surface);
+  }
+
+  .proof-rail {
+    display: grid;
+    gap: 1px;
+    padding-bottom: 3rem;
+  }
+
+  .proof-rail div {
+    min-height: 6.6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.82);
+    padding: 1rem;
+  }
+
+  .proof-rail strong {
+    font-size: 1.9rem;
+    line-height: 1;
+  }
+
+  .proof-rail span {
+    margin-top: 0.55rem;
+    color: var(--color-text-muted);
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .content-section {
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface);
+    overflow-x: hidden;
+    padding-block: 3.5rem;
+  }
+
+  .cost-section,
+  .quickstart-section {
+    background: var(--color-page);
+  }
+
+  .section-stack {
+    display: grid;
+    gap: 1.35rem;
+  }
+
+  .section-head {
+    max-width: 62rem;
+  }
+
+  .compact-head {
+    max-width: 52rem;
+  }
+
+  .section-head h2,
+  .quickstart-copy h2 {
+    margin: 0.75rem 0 0;
+    font-size: 2rem;
+    line-height: 1.12;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+  }
+
+  .section-head p,
+  .quickstart-copy li,
+  .performance-card p {
+    color: var(--color-text-muted);
+    line-height: 1.68;
+  }
+
+  .section-head p {
+    margin: 1rem 0 0;
+  }
+
+  .assumption-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .assumption-strip span {
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    padding: 0.42rem 0.68rem;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    font-weight: 620;
+  }
+
+  .cost-board {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .cost-visual,
+  .cost-table,
+  .direction-table,
+  .performance-card,
+  .code-block {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .cost-visual {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.15rem;
+    box-shadow: var(--shadow-surface);
+  }
+
+  .cost-visual-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .cost-visual-head span {
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  .cost-visual-head strong {
+    font-size: 1.55rem;
+    line-height: 1;
+  }
+
+  .bar-stack {
+    display: grid;
+    gap: 0.95rem;
+  }
+
+  .bar-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.42rem;
+    color: var(--color-text-muted);
+    font-weight: 650;
+  }
+
+  .bar-label strong {
+    color: var(--color-text);
+    font-size: 1.1rem;
+  }
+
+  .bar-track {
+    height: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: #eef2f7;
+  }
+
+  .bar-track span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-accent);
+  }
+
+  .bar-row:first-child .bar-track span {
+    background: var(--color-text);
+  }
+
+  .cost-table {
+    padding: 0.8rem;
+    box-shadow: var(--shadow-surface);
+  }
+
+  .cost-table-head,
+  .cost-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) 0.65fr 0.65fr;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.85rem 0.5rem;
+  }
+
+  .cost-table-head {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .cost-table-head strong,
+  .cost-row strong {
+    color: var(--color-text);
+    text-align: right;
+  }
+
+  .cost-row + .cost-row {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .cost-row span {
+    color: var(--color-text-muted);
+    line-height: 1.45;
+  }
+
+  .total-row {
+    background: var(--color-signal-soft);
+    font-size: 1.05rem;
+  }
+
+  .direction-table {
+    padding: 0.8rem;
+    box-shadow: var(--shadow-surface);
+  }
+
+  .direction-head,
+  .direction-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) repeat(3, minmax(6.5rem, 0.55fr));
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.82rem 0.5rem;
+  }
+
+  .direction-head {
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  .direction-row + .direction-row {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .direction-row span {
+    color: var(--color-text-muted);
+  }
+
+  .direction-head strong,
+  .direction-row strong {
+    color: var(--color-text);
+    text-align: right;
+  }
+
+  .direction-row strong:last-child {
+    color: var(--color-accent);
+  }
+
+  .performance-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .performance-card {
+    min-height: 10.5rem;
+    padding: 1.2rem;
+  }
+
+  .performance-card > strong {
+    display: inline-flex;
+    min-width: 3rem;
+    min-height: 2rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-page);
+    color: var(--color-accent);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.9rem;
+  }
+
+  .performance-card h3 {
+    margin: 0.9rem 0 0;
+    font-size: 1.2rem;
+  }
+
+  .performance-card p {
+    margin: 0.75rem 0 0;
+    overflow-wrap: anywhere;
+  }
+
+  .quickstart-layout {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .quickstart-copy ol {
+    display: grid;
+    gap: 0.85rem;
+    margin: 1.35rem 0 0;
+    padding-left: 1.2rem;
+  }
+
+  .quickstart-code {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .code-block {
+    overflow: hidden;
+  }
+
+  .code-block span {
+    display: block;
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.75rem 1rem;
+  }
+
+  pre {
+    overflow-x: auto;
+    margin: 0;
+    background: var(--color-text);
+    color: var(--color-surface);
+    padding: 1rem;
+    font-size: 0.8rem;
+    line-height: 1.55;
+  }
+
+  .verify-block pre {
+    background: #111827;
+  }
+
+  @media (min-width: 720px) {
+    .proof-rail,
+    .performance-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .cost-board {
+      grid-template-columns: minmax(18rem, 0.42fr) minmax(0, 0.58fr);
+      align-items: start;
+    }
+
+    .direction-table {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 719px) {
+    .hero-shell {
+      padding-block: 3rem 1.75rem;
+    }
+
+    .hero-copy,
+    .hero-copy h1,
+    .hero-lede {
+      max-width: 100%;
+    }
+
+    .hero-copy h1 {
+      font-size: 2.15rem;
+      line-height: 1.05;
+      text-wrap: balance;
+    }
+
+    .hero-lede {
+      font-size: 1rem;
+      line-height: 1.66;
+    }
+
+    .cost-visual-head {
+      display: grid;
+    }
+
+    .section-head h2,
+    .quickstart-copy h2 {
+      font-size: 1.45rem;
+      line-height: 1.18;
+    }
+
+    .cost-table-head,
+    .cost-row,
+    .direction-head,
+    .direction-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cost-table-head strong,
+    .cost-row strong,
+    .direction-head strong,
+    .direction-row strong {
+      text-align: left;
+    }
+  }
+
+  @media (min-width: 980px) {
+    .hero-shell {
+      grid-template-columns: minmax(0, 1.08fr) minmax(24rem, 0.72fr);
+      padding-block: 5.35rem 2.4rem;
+    }
+
+    .hero-copy h1 {
+      font-size: 4.45rem;
+    }
+
+    .quickstart-layout {
+      grid-template-columns: minmax(18rem, 0.38fr) minmax(0, 0.62fr);
+      align-items: start;
+    }
+  }
+</style>

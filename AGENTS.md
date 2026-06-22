@@ -20,6 +20,8 @@ If an older dependency version is chosen, document the reason near the dependenc
 
 When creating or revising a project page, follow `PROJECT_PAGE_STANDARD.md`. Project pages must share nowake.ai visual language, but each project needs a page structure tailored to its own product shape; do not reuse one fixed page template across projects.
 
+When creating or revising architecture diagrams, flow diagrams, topology maps, or animated technical SVGs, follow `SVG-DESIGN.md`. Hero-critical project diagrams should be handcrafted SVG unless there is a documented reason to use Mermaid, an image, or an HTML-only diagram.
+
 For every project page, do both jobs well:
 
 - Explain the project principle clearly enough that a new visitor can understand how it works.

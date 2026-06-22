@@ -13,6 +13,7 @@ The implementation is an Astro static site under `src/`, using the visual langua
 ## Documents
 
 - [Design Guide](DESIGN.md): nowake.ai visual language, design tokens, components, and implementation rules.
+- [SVG Design Guide](SVG-DESIGN.md): shared language for project architecture diagrams, flow diagrams, and animated SVGs.
 - [Organization Strategy](content/org-strategy.md): nowake.ai positioning, project map, and long-term direction.
 - [Site Plan](content/site-plan.md): website goals, information architecture, hosting direction, and implementation phases.
 - [Copy Deck](content/copy-deck.md): reusable homepage and project copy.

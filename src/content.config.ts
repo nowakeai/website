@@ -6,7 +6,7 @@ const docs = defineCollection({
   loader: docsLoader(),
   schema: docsSchema({
     extend: z.object({
-      project: z.enum(["nowake-ai", "kube-insight", "svc-lb-mux"]),
+      project: z.enum(["nowake-ai", "betternat", "kube-insight", "svc-lb-mux"]),
       category: z.enum([
         "overview",
         "concept",

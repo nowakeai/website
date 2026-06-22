@@ -1,0 +1,251 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="betternat-arch-title betternat-arch-desc" viewBox="0 0 760 520">
+  <title id="betternat-arch-title">BetterNAT active appliance architecture</title>
+  <desc id="betternat-arch-desc">
+    Private subnet workloads send default-route traffic through an active BetterNAT appliance. Terraform and a DynamoDB
+    lease coordinate route and egress IP ownership with a standby appliance.
+  </desc>
+  <defs>
+    <marker id="bn-arrow-data" markerUnits="userSpaceOnUse" markerWidth="18" markerHeight="18" refX="15.5" refY="9" orient="auto">
+      <path d="M1.5,1.5 L16.5,9 L1.5,16.5 Z" fill="#2563eb" />
+    </marker>
+    <marker id="bn-arrow-control" markerUnits="userSpaceOnUse" markerWidth="17" markerHeight="17" refX="14.5" refY="8.5" orient="auto">
+      <path d="M1.5,1.5 L15.5,8.5 L1.5,15.5 Z" fill="#10845b" />
+    </marker>
+    <linearGradient id="bn-active-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#ecfdf5" />
+    </linearGradient>
+    <linearGradient id="bn-public-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#eff6ff" />
+    </linearGradient>
+  </defs>
+  <style>
+    .svg-frame,
+    .zone rect,
+    .svg-node rect {
+      vector-effect: non-scaling-stroke;
+    }
+
+    .svg-frame {
+      fill: #ffffff;
+      stroke: #d9e1ec;
+    }
+
+    .zone rect {
+      fill: #eef3fa;
+      stroke: #d9e1ec;
+    }
+
+    .public-zone rect {
+      fill: #f8fbff;
+    }
+
+    .svg-node rect {
+      fill: #ffffff;
+      stroke: #b9c6d8;
+    }
+
+    .active-node > rect {
+      fill: url("#bn-active-fill");
+      stroke: #74b8aa;
+    }
+
+    .standby-node rect {
+      fill: #fbfcfe;
+    }
+
+    .internet-node rect {
+      fill: url("#bn-public-fill");
+      stroke: #7da6f7;
+    }
+
+    .control-node rect,
+    .terraform-node rect {
+      fill: #fffaf0;
+      stroke: #9bb8ea;
+    }
+
+    .active-ring {
+      fill: none;
+      stroke: #10845b;
+      stroke-width: 2;
+    }
+
+    .svg-caption,
+    .zone-title,
+    text {
+      fill: #171b24;
+      font-family: "Geist", system-ui, sans-serif;
+      font-size: 15px;
+      font-weight: 650;
+    }
+
+    .svg-caption,
+    .zone-title,
+    .mono,
+    .diagram-legend text {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+    }
+
+    .svg-caption,
+    .zone-title,
+    .mono,
+    .diagram-legend text {
+      fill: #667085;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .flow-data,
+    .flow-control {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 3.25;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .flow-data {
+      stroke: #2563eb;
+      marker-end: url("#bn-arrow-data");
+    }
+
+    .flow-control {
+      stroke: #10845b;
+      stroke-dasharray: 8 8;
+      marker-end: url("#bn-arrow-control");
+    }
+
+    .legend-data,
+    .legend-control {
+      stroke-width: 3.25;
+      stroke-linecap: round;
+    }
+
+    .legend-data {
+      stroke: #2563eb;
+    }
+
+    .legend-control {
+      stroke: #10845b;
+      stroke-dasharray: 7 7;
+    }
+
+    .legend-active {
+      fill: #10845b;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .flow-data {
+        animation: flow-pulse 2.8s linear infinite;
+        stroke-dasharray: 14 10;
+      }
+
+      .flow-control {
+        animation: control-pulse 3.2s linear infinite;
+      }
+
+      .active-ring {
+        animation: active-breathe 2.8s ease-in-out infinite;
+      }
+    }
+
+    @keyframes flow-pulse {
+      to {
+        stroke-dashoffset: -48;
+      }
+    }
+
+    @keyframes control-pulse {
+      to {
+        stroke-dashoffset: -32;
+      }
+    }
+
+    @keyframes active-breathe {
+      0%,
+      100% {
+        opacity: 0.62;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+  </style>
+
+  <rect class="svg-frame" x="20" y="20" width="720" height="480" rx="8" />
+  <text class="svg-caption" x="48" y="58">betterNat_gateway / one AZ egress cell</text>
+
+  <g class="zone">
+    <rect x="48" y="92" width="218" height="250" rx="8" />
+    <text class="zone-title" x="68" y="124">private subnet</text>
+    <g class="svg-node">
+      <title>Download-heavy private workloads</title>
+      <rect x="72" y="152" width="156" height="62" rx="8" />
+      <text x="92" y="181">EKS nodes</text>
+      <text class="mono" x="92" y="201">crawlers / RPC</text>
+    </g>
+    <g class="svg-node small-node">
+      <title>Default route points at the active BetterNAT appliance</title>
+      <rect x="72" y="246" width="156" height="54" rx="8" />
+      <text x="92" y="274">route table</text>
+      <text class="mono" x="92" y="293">0.0.0.0/0</text>
+    </g>
+  </g>
+
+  <g class="zone public-zone">
+    <rect x="314" y="92" width="248" height="250" rx="8" />
+    <text class="zone-title" x="334" y="124">public subnet appliance pool</text>
+    <g class="svg-node standby-node">
+      <title>Standby appliance can take ownership after fencing</title>
+      <rect x="340" y="152" width="176" height="58" rx="8" />
+      <text x="364" y="178">standby gateway</text>
+      <text class="mono" x="364" y="197">ready to acquire</text>
+    </g>
+    <g class="svg-node active-node" tabindex="0">
+      <title>Active appliance owns the private default route and optional EIP</title>
+      <rect x="340" y="244" width="176" height="72" rx="8" />
+      <rect class="active-ring" x="348" y="252" width="160" height="56" rx="6" />
+      <text x="364" y="273">active gateway</text>
+      <text class="mono" x="364" y="294">agent + LoxiLB</text>
+    </g>
+  </g>
+
+  <g class="svg-node internet-node">
+    <title>Public internet egress through the active appliance path</title>
+    <rect x="610" y="164" width="102" height="86" rx="8" />
+    <text x="636" y="196">EIP</text>
+    <text class="mono" x="632" y="216">internet</text>
+  </g>
+
+  <g class="svg-node control-node">
+    <title>DynamoDB lease and fencing state</title>
+    <rect x="338" y="386" width="178" height="64" rx="8" />
+    <text x="365" y="414">DynamoDB lease</text>
+    <text class="mono" x="365" y="434">route owner fence</text>
+  </g>
+
+  <g class="svg-node terraform-node">
+    <title>Terraform provider creates and configures the gateway resources</title>
+    <rect x="70" y="386" width="162" height="64" rx="8" />
+    <text x="94" y="414">Terraform</text>
+    <text class="mono" x="94" y="434">betternat_gateway</text>
+  </g>
+
+  <path class="flow-data data-1" d="M228 183 H286 Q302 183 302 199 V230 Q302 244 320 244 H340" />
+  <path class="flow-data data-2" d="M516 280 H606" />
+  <path class="flow-control control-1" d="M232 418 H338" />
+  <path class="flow-control control-2" d="M427 386 V318" />
+  <path class="flow-control control-3" d="M516 418 H596 Q606 418 606 408 V258" />
+  <path class="flow-control control-4" d="M428 210 V244" />
+
+  <g class="diagram-legend" aria-hidden="true">
+    <line class="legend-data" x1="66" y1="472" x2="104" y2="472" />
+    <text x="114" y="477">data plane</text>
+    <line class="legend-control" x1="214" y1="472" x2="252" y2="472" />
+    <text x="262" y="477">control plane</text>
+    <circle class="legend-active" cx="388" cy="472" r="6" />
+    <text x="402" y="477">active ownership</text>
+  </g>
+</svg>

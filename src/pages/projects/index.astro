@@ -25,6 +25,17 @@ const activeProjects = [
     repo: "https://github.com/nowakeai/svc-lb-mux",
     icon: "workflow",
   },
+  {
+    name: "betternat",
+    status: "Active / alpha",
+    tag: "egress",
+    title: "Self-owned NAT for download-heavy private workloads.",
+    description:
+      "Replaces AWS NAT Gateway per-GB processing fees with an observable EC2 appliance pool, Terraform install UX, stable egress IP failover, and rollback-aware route ownership.",
+    href: "/projects/betternat",
+    repo: "https://github.com/nowakeai/betternat",
+    icon: "activity",
+  },
 ] as const;
 
 const directions = [
@@ -294,6 +305,10 @@ const directions = [
   }
 
   @media (min-width: 1024px) {
+    .project-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     .page-hero h1 {
       font-size: 3.75rem;
     }

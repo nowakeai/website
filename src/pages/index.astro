@@ -189,6 +189,23 @@ const principles = [
             <a class="button button-secondary" href="https://github.com/nowakeai/svc-lb-mux">GitHub</a>
           </div>
         </article>
+
+        <article class="surface project-card">
+          <div class="project-meta">
+            <p>Active / alpha</p>
+            <span class="badge warn-badge">egress</span>
+          </div>
+          <h3>BetterNAT</h3>
+          <p>
+            Self-owned, observable NAT for AWS private subnet workloads where managed NAT Gateway processing fees become
+            a visible cost problem.
+          </p>
+          <div class="card-actions">
+            <a class="button button-primary" href="/projects/betternat">Project page</a>
+            <a class="button button-secondary" href="/docs/betternat/">Docs</a>
+            <a class="button button-secondary" href="https://github.com/nowakeai/betternat">GitHub</a>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -456,6 +473,11 @@ const principles = [
     color: var(--color-signal);
   }
 
+  .warn-badge {
+    background: var(--color-warn-soft);
+    color: var(--color-warn);
+  }
+
   .principles-section .principle-grid {
     margin-top: 0;
   }
@@ -514,6 +536,10 @@ const principles = [
     .four-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    .project-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   @media (min-width: 1024px) {
@@ -535,7 +561,7 @@ const principles = [
     }
 
     .project-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .principle-grid {
