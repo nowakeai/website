@@ -20,7 +20,7 @@ This documentation site collects public, task-oriented documentation for nowake.
 
 [svc-lb-mux](/docs/svc-lb-mux/) is an operations-first Kubernetes controller that lets multiple application-facing `LoadBalancer` Services share one provider-managed Layer 4 load balancer, including channel-driven external-dns aggregation.
 
-[BetterNAT](/docs/betternat/) is a self-owned, observable egress gateway for high-volume AWS private subnet workloads where NAT Gateway processing fees become a visible cost problem.
+[BetterNAT](/docs/betternat/) is a self-hosted, highly available, observable egress gateway for AWS and GCP private workloads, with v0.2 Terraform modules as the recommended install path.
 
 ## Getting Started
 
@@ -28,7 +28,7 @@ Start with the project overview that matches the system you are evaluating:
 
 - Use [kube-insight](/docs/kube-insight/) when you need retained Kubernetes state for investigation, automation, or agent workflows.
 - Use [svc-lb-mux](/docs/svc-lb-mux/) when cloud provider load balancer count, cost, or port management is becoming operationally painful.
-- Use [BetterNAT](/docs/betternat/) when private subnet workloads move enough public internet traffic that managed NAT processing fees deserve an explicit cost and operations tradeoff.
+- Use [BetterNAT](/docs/betternat/) when private workloads move enough public internet traffic that managed NAT processing fees, route ownership, failover behavior, and observability deserve an explicit cost and operations tradeoff.
 
 ## Agent And UI Workflows
 
@@ -54,7 +54,7 @@ Public docs should state trust boundaries, sanitization behavior, permissions, s
 
 kube-insight security docs include current [Sanitization And Retention](/docs/kube-insight/security/sanitization-and-retention/) behavior plus roadmap design notes for [Kubernetes RBAC Inheritance](/docs/kube-insight/security/kubernetes-rbac-inheritance/) and [Agent SQL RBAC Filtering](/docs/kube-insight/security/agent-rbac-sql-filtering/).
 
-BetterNAT security docs include [IAM Policy](/docs/betternat/security/iam-policy/) and [Security Hardening](/docs/betternat/security/security-hardening/) for the alpha AWS appliance model.
+BetterNAT security docs include [IAM Policy](/docs/betternat/security/iam-policy/) and [Security Hardening](/docs/betternat/security/security-hardening/) for the self-managed gateway model.
 
 ## Source Model
 

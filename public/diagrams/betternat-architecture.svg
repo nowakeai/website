@@ -230,7 +230,7 @@
     <title>Terraform provider creates and configures the gateway resources</title>
     <rect x="70" y="386" width="162" height="64" rx="8" />
     <text x="94" y="414">Terraform</text>
-    <text class="mono" x="94" y="434">betternat_gateway</text>
+    <text class="mono" x="94" y="434">Terraform module</text>
   </g>
 
   <path class="flow-data data-1" d="M228 183 H286 Q302 183 302 199 V230 Q302 244 320 244 H340" />

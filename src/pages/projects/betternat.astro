@@ -35,55 +35,82 @@ const costBars = [
   { label: "BetterNAT", amount: "$995/mo", width: "31%" },
 ] as const;
 
-const performanceItems = [
+const moduleCards = [
   {
-    value: "eBPF",
-    title: "Fast datapath",
-    text: "LoxiLB datapath, built for load balancing and NAT without iptables and nf_conntrack chain traversal.",
+    cloud: "AWS module",
+    source: 'source = "nowakeai/betternat/aws"',
+    text: "Wraps the AWS gateway primitive, accepts common VPC module outputs, and defaults toward active/standby capacity, stable EIP, cloud-init bootstrap, and rollback on destroy.",
   },
   {
-    value: "EC2",
-    title: "Explicit sizing",
-    text: "Throughput is controlled by instance type, ENA/network limits, and appliance count.",
-  },
-  {
-    value: "N+1",
-    title: "Self-healing failover",
-    text: "DynamoDB lease fencing plus route/EIP takeover recovers new-flow egress automatically.",
+    cloud: "GCP module",
+    source: 'source = "nowakeai/betternat/google"',
+    text: "Wraps the GCP gateway primitive for existing VPC/subnetwork installs, tagged private-client route ownership, Firestore HA, MIG capacity repair, LoxiLB bootstrap, and optional stable public identity.",
   },
 ] as const;
 
-const quickstartSteps = [
-  "Start in a disposable VPC.",
-  "Let `betternat_gateway` own the private default route.",
-  "Verify egress, metrics, and live diagnostics before existing-VPC adoption.",
+const haItems = [
+  {
+    value: "HA",
+    title: "Ownership, not just datapath",
+    text: "BetterNAT adds lease fencing, active/standby ownership, route replacement, public identity handover where supported, and rollback-oriented lifecycle around LoxiLB.",
+  },
+  {
+    value: "Runtime",
+    title: "Versioned artifacts",
+    text: "Terraform installs resolve BetterNAT runtime artifacts through provider manifests, so gateway nodes can bootstrap without hand-managed binary URLs in the normal path.",
+  },
+  {
+    value: "Ops",
+    title: "Observable gateway",
+    text: "Gateway status, diagnostics, Prometheus metrics, and route ownership state are first-class operating surfaces.",
+  },
 ] as const;
 
-const terraformSnippet = [
-  'resource "betternat_gateway" "egress" {',
-  '  name   = "prod-egress-a"',
-  '  region = "us-west-2"',
-  "  vpc_id = aws_vpc.main.id",
+const validationItems = [
+  "AWS disposable module smoke passed: apply, two-gateway active/standby bootstrap, private-client egress, stable EIP, proactive handover, destroy, and residual cleanup.",
+  "GCP disposable module smoke passed: apply, Firestore HA, MIG capacity repair, private-client egress, stable public identity, proactive handover, passive-stop failover, destroy, and residual cleanup.",
+  "Terraform Registry install and validate paths passed for the provider and the AWS/GCP modules.",
+] as const;
+
+const limitItems = [
+  "BetterNAT is self-managed; it does not provide AWS NAT Gateway or Cloud NAT SLA semantics.",
+  "Active flows may reset during failover.",
+  "AWS gateway groups are one AZ per HA group. GCP gateway groups are one zone per gateway group.",
+  "GCP stable public identity is connectivity-first: private route handover happens first, and new successful connections may temporarily use a gateway's ordinary public IP during convergence.",
+  "LoxiLB is the supported datapath.",
+] as const;
+
+const awsModuleSnippet = [
+  'module "betternat" {',
+  '  source  = "nowakeai/betternat/aws"',
+  '  version = "~> 0.2"',
   "",
-  "  public_subnet_ids = {",
-  '    "us-west-2a" = aws_subnet.public_a.id',
-  "  }",
+  '  name   = "prod-egress"',
+  "  vpc_id = module.vpc.vpc_id",
   "",
-  "  private_route_table_ids = {",
-  '    "us-west-2a" = [aws_route_table.private_a.id]',
-  "  }",
+  "  azs                     = module.vpc.azs",
+  "  public_subnet_ids       = module.vpc.public_subnets",
+  "  private_route_table_ids = module.vpc.private_route_table_ids",
   "",
-  "  private_cidrs        = [aws_vpc.main.cidr_block]",
-  "  ami_id               = data.aws_ami.al2023_arm64.id",
-  '  instance_type        = "t4g.small"',
-  "  desired_capacity     = 2",
-  "  stable_egress_ip     = true",
-  "  prometheus_enabled   = true",
-  "  rollback_on_destroy  = true",
-  "  agent_binary_url     = var.agent_binary_url",
-  "  agent_binary_sha256  = var.agent_binary_sha256",
-  "  cli_binary_url       = var.cli_binary_url",
-  "  cli_binary_sha256    = var.cli_binary_sha256",
+  "  private_cidrs = [module.vpc.vpc_cidr_block]",
+  "}",
+].join("\n");
+
+const gcpModuleSnippet = [
+  'module "betternat" {',
+  '  source  = "nowakeai/betternat/google"',
+  '  version = "~> 0.2"',
+  "",
+  '  name       = "prod-egress"',
+  "  project_id = var.project_id",
+  '  region     = "us-west2"',
+  '  zone       = "us-west2-a"',
+  "",
+  "  network    = google_compute_network.main.name",
+  "  subnetwork = google_compute_subnetwork.private.name",
+  '  client_tag = "private-egress-client"',
+  "",
+  '  private_cidrs = ["10.10.0.0/16"]',
   "}",
 ].join("\n");
 
@@ -96,18 +123,18 @@ const verifySnippet = [
 
 <BaseLayout
   title="BetterNAT | nowake.ai"
-  description="BetterNAT is a self-owned, observable egress gateway for high-volume AWS private subnet workloads."
+  description="BetterNAT is a self-hosted, highly available, observable low-cost egress gateway for private workloads on AWS and GCP."
   githubHref="https://github.com/nowakeai/betternat"
   githubLabel="betternat"
 >
   <section class="bn-hero">
     <div class="page-shell hero-shell">
       <div class="hero-copy">
-        <p class="eyebrow">BetterNAT / AWS alpha technical preview</p>
-        <h1>Better not be surprised by your NAT Gateway bill. Use BetterNAT.</h1>
+        <p class="eyebrow">BetterNAT / self-hosted egress gateway</p>
+        <h1>Lower-cost private egress with HA ownership and observability.</h1>
         <p class="hero-lede">
-          BetterNAT is a Terraform-installed EC2 appliance pool for private subnet egress. It targets high-volume,
-          download-heavy workloads where NAT Gateway per-GB processing is the expensive part.
+          BetterNAT is a self-hosted, highly available, observable egress gateway for teams that want lower-cost
+          private-subnet internet access without giving up route ownership, failover visibility, and rollback control.
         </p>
 
         <div class="hero-actions">
@@ -126,21 +153,65 @@ const verifySnippet = [
         </div>
       </div>
 
-      <figure class="architecture-panel" aria-label="BetterNAT AWS egress architecture">
+      <figure class="architecture-panel" aria-label="BetterNAT egress architecture">
         <div class="diagram-kicker">
-          <span>AWS egress architecture</span>
-          <strong>data + control planes</strong>
+          <span>egress architecture</span>
+          <strong>gateway HA</strong>
         </div>
         <img
           class="architecture-img"
           src="/diagrams/betternat-architecture.svg"
-          alt="BetterNAT active gateway, standby gateway, Terraform, DynamoDB lease, and EIP architecture"
+          alt="BetterNAT active gateway, standby gateway, Terraform, lease, route, and public identity architecture"
         />
       </figure>
     </div>
 
     <div class="page-shell proof-rail" aria-label="BetterNAT proof points">
       {heroProof.map((item) => <div><strong>{item.value}</strong><span>{item.label}</span></div>)}
+    </div>
+  </section>
+
+  <section id="quickstart" class="content-section quickstart-section">
+    <div class="page-shell quickstart-layout">
+      <div class="quickstart-copy">
+        <p class="section-label">Install path</p>
+        <h2>Start with a Terraform module, then tune the gateway group for your cloud.</h2>
+        <p>
+          BetterNAT is designed to feel like a networking module, not a pile of low-level resources. Use the AWS or GCP
+          module first; drop to provider primitives only when you need advanced control.
+        </p>
+        <div class="quickstart-actions">
+          <a class="button button-primary" href="/docs/betternat/getting-started/">
+            <Icon name="book-open" class="icon-sm" />
+            Quickstart
+          </a>
+          <a class="button button-secondary" href="/docs/betternat/reference/configuration/">
+            <Icon name="wrench" class="icon-sm" />
+            Configuration
+          </a>
+        </div>
+      </div>
+
+      <div class="quickstart-code" aria-label="BetterNAT Terraform module examples">
+        <div class="code-block">
+          <span>aws module</span>
+          <pre><code>{awsModuleSnippet}</code></pre>
+        </div>
+        <div class="code-block">
+          <span>gcp module</span>
+          <pre><code>{gcpModuleSnippet}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-shell module-grid" aria-label="BetterNAT Terraform module summary">
+      {moduleCards.map((item) => (
+        <article class="module-card">
+          <span>{item.cloud}</span>
+          <h3>{item.source}</h3>
+          <p>{item.text}</p>
+        </article>
+      ))}
     </div>
   </section>
 
@@ -211,15 +282,15 @@ const verifySnippet = [
     </div>
   </section>
 
-  <section id="performance" class="content-section">
+  <section id="runtime" class="content-section">
     <div class="page-shell section-stack">
       <div class="section-head compact-head">
-        <p class="section-label">Performance + stability advantage</p>
-        <h2>eBPF datapath, explicit sizing, decentralized recovery.</h2>
+        <p class="section-label">Runtime + HA</p>
+        <h2>BetterNAT's product boundary is HA egress ownership around LoxiLB.</h2>
       </div>
 
       <div class="performance-grid">
-        {performanceItems.map((item) => (
+        {haItems.map((item) => (
           <article class="performance-card">
             <strong>{item.value}</strong>
             <h3>{item.title}</h3>
@@ -227,38 +298,48 @@ const verifySnippet = [
           </article>
         ))}
       </div>
+
+      <div class="code-block verify-block">
+        <span>verify</span>
+        <pre><code>{verifySnippet}</code></pre>
+      </div>
     </div>
   </section>
 
-  <section id="quickstart" class="content-section quickstart-section">
-    <div class="page-shell quickstart-layout">
-      <div class="quickstart-copy">
-        <p class="section-label">Quickstart</p>
-        <h2>One resource owns the appliance pool and private default route.</h2>
-        <ol>
-          {quickstartSteps.map((step) => <li>{step}</li>)}
-        </ol>
-        <div class="quickstart-actions">
-          <a class="button button-primary" href="/docs/betternat/getting-started/">
-            <Icon name="book-open" class="icon-sm" />
-            Full guide
-          </a>
-          <a class="button button-secondary" href="/docs/betternat/guides/existing-vpc-install/">
-            <Icon name="wrench" class="icon-sm" />
-            Existing VPC
-          </a>
-        </div>
+  <section id="validation" class="content-section validation-section">
+    <div class="page-shell evidence-layout">
+      <div class="section-head compact-head">
+        <p class="section-label">Validation</p>
+        <h2>Registry installs and disposable cloud smokes have passed.</h2>
+        <p>
+          AWS is the primary evaluation path today. GCP is available for carefully planned adoption, with
+          connectivity-first public identity convergence.
+        </p>
       </div>
+      <div class="evidence-list">
+        {validationItems.map((item) => (
+          <div>
+            <Icon name="check-circle" class="icon-sm" />
+            <p>{item}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
 
-      <div class="quickstart-code" aria-label="BetterNAT Terraform and verification example">
-        <div class="code-block">
-          <span>terraform</span>
-          <pre><code>{terraformSnippet}</code></pre>
-        </div>
-        <div class="code-block verify-block">
-          <span>verify</span>
-          <pre><code>{verifySnippet}</code></pre>
-        </div>
+  <section id="limits" class="content-section limits-section">
+    <div class="page-shell evidence-layout">
+      <div class="section-head compact-head">
+        <p class="section-label">Current limits</p>
+        <h2>Use BetterNAT when the self-managed tradeoff is explicit.</h2>
+      </div>
+      <div class="evidence-list limit-list">
+        {limitItems.map((item) => (
+          <div>
+            <Icon name="alert-triangle" class="icon-sm" />
+            <p>{item}</p>
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -285,7 +366,8 @@ const verifySnippet = [
 
   .hero-shell > *,
   .section-stack > *,
-  .quickstart-layout > * {
+  .quickstart-layout > *,
+  .evidence-layout > * {
     min-width: 0;
   }
 
@@ -296,7 +378,8 @@ const verifySnippet = [
   .eyebrow,
   .section-label,
   .cost-table-head,
-  .code-block span {
+  .code-block span,
+  .module-card span {
     color: var(--color-accent);
     font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-size: 0.78rem;
@@ -330,6 +413,7 @@ const verifySnippet = [
   }
 
   .architecture-panel {
+    width: 100%;
     max-width: 100%;
     min-width: 0;
     margin: 0;
@@ -404,13 +488,20 @@ const verifySnippet = [
   }
 
   .cost-section,
-  .quickstart-section {
+  .quickstart-section,
+  .limits-section {
     background: var(--color-page);
   }
 
-  .section-stack {
+  .section-stack,
+  .module-grid,
+  .evidence-layout {
     display: grid;
     gap: 1.35rem;
+  }
+
+  .module-grid {
+    margin-top: 1.25rem;
   }
 
   .section-head {
@@ -431,13 +522,16 @@ const verifySnippet = [
   }
 
   .section-head p,
-  .quickstart-copy li,
-  .performance-card p {
+  .quickstart-copy p,
+  .performance-card p,
+  .module-card p,
+  .evidence-list p {
     color: var(--color-text-muted);
     line-height: 1.68;
   }
 
-  .section-head p {
+  .section-head p,
+  .quickstart-copy p {
     margin: 1rem 0 0;
   }
 
@@ -467,17 +561,26 @@ const verifySnippet = [
   .cost-table,
   .direction-table,
   .performance-card,
-  .code-block {
+  .code-block,
+  .module-card,
+  .evidence-list div {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     background: var(--color-surface);
+  }
+
+  .cost-visual,
+  .cost-table,
+  .direction-table,
+  .module-card,
+  .evidence-list div {
+    box-shadow: var(--shadow-surface);
   }
 
   .cost-visual {
     display: grid;
     gap: 1.25rem;
     padding: 1.15rem;
-    box-shadow: var(--shadow-surface);
   }
 
   .cost-visual-head {
@@ -539,9 +642,9 @@ const verifySnippet = [
     background: var(--color-text);
   }
 
-  .cost-table {
+  .cost-table,
+  .direction-table {
     padding: 0.8rem;
-    box-shadow: var(--shadow-surface);
   }
 
   .cost-table-head,
@@ -575,11 +678,6 @@ const verifySnippet = [
   .total-row {
     background: var(--color-signal-soft);
     font-size: 1.05rem;
-  }
-
-  .direction-table {
-    padding: 0.8rem;
-    box-shadow: var(--shadow-surface);
   }
 
   .direction-head,
@@ -642,12 +740,15 @@ const verifySnippet = [
     font-size: 0.9rem;
   }
 
-  .performance-card h3 {
+  .performance-card h3,
+  .module-card h3 {
     margin: 0.9rem 0 0;
     font-size: 1.2rem;
   }
 
-  .performance-card p {
+  .performance-card p,
+  .module-card p,
+  .evidence-list p {
     margin: 0.75rem 0 0;
     overflow-wrap: anywhere;
   }
@@ -655,13 +756,6 @@ const verifySnippet = [
   .quickstart-layout {
     display: grid;
     gap: 1.5rem;
-  }
-
-  .quickstart-copy ol {
-    display: grid;
-    gap: 0.85rem;
-    margin: 1.35rem 0 0;
-    padding-left: 1.2rem;
   }
 
   .quickstart-code {
@@ -693,10 +787,47 @@ const verifySnippet = [
     background: #111827;
   }
 
+  .module-card {
+    padding: 1.1rem;
+  }
+
+  .module-card h3 {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.98rem;
+    overflow-wrap: anywhere;
+  }
+
+  .evidence-list {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .evidence-list div {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.8rem;
+    align-items: start;
+    padding: 1rem;
+  }
+
+  .evidence-list svg {
+    color: var(--color-accent);
+    margin-top: 0.2rem;
+  }
+
+  .limit-list svg {
+    color: #b45309;
+  }
+
   @media (min-width: 720px) {
     .proof-rail,
-    .performance-grid {
+    .performance-grid,
+    .module-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .module-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .cost-board {
@@ -729,6 +860,25 @@ const verifySnippet = [
     .hero-lede {
       font-size: 1rem;
       line-height: 1.66;
+    }
+
+    .hero-actions .button,
+    .quickstart-actions .button {
+      flex: 1 1 10rem;
+      min-width: 0;
+    }
+
+    .architecture-panel {
+      overflow-x: auto;
+    }
+
+    .diagram-kicker {
+      display: grid;
+    }
+
+    .architecture-img {
+      width: 34rem;
+      max-width: none;
     }
 
     .cost-visual-head {
@@ -766,7 +916,8 @@ const verifySnippet = [
       font-size: 4.45rem;
     }
 
-    .quickstart-layout {
+    .quickstart-layout,
+    .evidence-layout {
       grid-template-columns: minmax(18rem, 0.38fr) minmax(0, 0.62fr);
       align-items: start;
     }
