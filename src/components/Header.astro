@@ -90,7 +90,7 @@ const navItems = [
       {navItems.map((item) => <a class="min-h-11 inline-flex items-center font-medium text-[var(--color-text)] transition-colors hover:text-[var(--color-accent)]" href={item.href}>{item.label}</a>)}
     </div>
 
-    <a class="button button-secondary hidden md:inline-flex" href={githubHref}>
+    <a class="button button-secondary header-github-link" href={githubHref}>
       <Icon name="github" class="icon-sm" />
       {githubLabel}
     </a>
@@ -110,5 +110,15 @@ const navItems = [
     pointer-events: auto;
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+  }
+
+  .header-github-link {
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .header-github-link {
+      display: inline-flex;
+    }
   }
 </style>
