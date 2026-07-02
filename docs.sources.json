@@ -216,6 +216,7 @@
       "source_repo": "nowakeai/kube-insight",
       "localPath": "vendor/kube-insight",
       "targetRoot": "src/content/docs/docs/kube-insight",
+      "last_verified": "2026-07-02",
       "pages": [
         {
           "source": "docs/users/getting-started/quickstart.md",
